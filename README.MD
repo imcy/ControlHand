@@ -10,4 +10,16 @@ title:  "机械手控制程序"
 * CalculateThetaByCoordinate.m等matlab文件用于计算机械手的逆运动学部分
 ---
 ### GloableVariable
->包括定义的一些机械手的全局变量，包括手指的长度及坐标值
+包括定义的一些机械手的全局变量，包括手指的长度及坐标值
+### 3DSReader
+读取3ds文件的程序
+### 3DSLoaderView
+下拉菜单的点击事件函数实现
+### MainFrm
+mfc的主界面
+### getPythonData
+初始化python模块并完成函数的调用和值得返回
+### GloveSampleDlg
+数据手套数据读取界面
+### RobotHand
+机械手的主要控制程序，包括正逆运动学的实现
