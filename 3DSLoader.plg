@@ -1,0 +1,45 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: 3DSLoader - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSPB1.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Fp"Debug/3DSLoader.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"C:\Documents and Settings\Administrator\桌面\张维扬毕业设计3DSLoader\TriList.cpp"
+"C:\Documents and Settings\Administrator\桌面\张维扬毕业设计3DSLoader\TriObject.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSPB1.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSPB2.tmp" with contents
+[
+/nologo /subsystem:windows /incremental:yes /pdb:"Debug/3DSLoader.pdb" /debug /machine:I386 /out:"Debug/3DSLoader.exe" /pdbtype:sept 
+".\Debug\3DSLoader.obj"
+".\Debug\3DSLoaderDoc.obj"
+".\Debug\3DSLoaderView.obj"
+".\Debug\3dsReader.obj"
+".\Debug\MainFrm.obj"
+".\Debug\StdAfx.obj"
+".\Debug\TriList.obj"
+".\Debug\TriObject.obj"
+".\Debug\3DSLoader.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSPB2.tmp"
+<h3>Output Window</h3>
+Compiling...
+TriList.cpp
+fatal error C1083: Cannot open source file: 'C:\Documents and Settings\Administrator\桌面\张维扬毕业设计3DSLoader\TriList.cpp': No such file or directory
+TriObject.cpp
+fatal error C1083: Cannot open source file: 'C:\Documents and Settings\Administrator\桌面\张维扬毕业设计3DSLoader\TriObject.cpp': No such file or directory
+Generating Code...
+执行 cl.exe 时出错.
+
+
+
+<h3>Results</h3>
+3DSLoader.exe - 1 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
