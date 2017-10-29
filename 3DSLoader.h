@@ -13,6 +13,7 @@
 #include "resource.h"       // main symbols
 #include "RobotHand.h"
 #include "GloveSampleDlg.h"
+#include "KinectWin.h"
 /////////////////////////////////////////////////////////////////////////////
 // CMy3DSLoaderApp:
 // See 3DSLoader.cpp for the implementation of this class
@@ -28,6 +29,7 @@ public:
 	public:
 	virtual BOOL InitInstance();
 	GloveSampleDlg *dlg;
+	KinectWin *kinwin;
 	void OnTest();
 	void OnAngle(); //角度处理函数
 	//}}AFX_VIRTUAL
@@ -40,6 +42,7 @@ public:
 		//    DO NOT EDIT what you see in these blocks of generated code !
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+	afx_msg void OnOpenKinect();
 };
 
 

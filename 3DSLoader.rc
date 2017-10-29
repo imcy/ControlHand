@@ -171,6 +171,14 @@ BEGIN
         MENUITEM "钳",                           ID_Tongs
         MENUITEM "测试",                          ID_Test
     END
+    POPUP "摄像头"
+    BEGIN
+        MENUITEM "打开摄像头",                       ID_OPENK
+    END
+    POPUP "数据手套"
+    BEGIN
+        MENUITEM "打开数据手套",                      ID_OPENGLOVE
+    END
 END
 
 
@@ -285,6 +293,39 @@ BEGIN
     CONTROL         "同步角度",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,267,16,48,10
 END
 
+IDD_Kinect DIALOGEX 0, 0, 927, 269
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "读取摄像头"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "关闭",IDCANCEL2,290,155,59,15
+    CONTROL         "",IDC_Dept,"Static",SS_BLACKRECT,642,21,259,162
+    PUSHBUTTON      "打开自带摄像头",IDC_SELF,291,42,59,15
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKRECT,29,21,249,162
+    PUSHBUTTON      "打开彩色摄像头",IDC_BUTTON4,291,100,59,15
+    PUSHBUTTON      "打开深度摄像头",IDC_BUTTON5,291,78,59,15
+    EDITTEXT        IDC_EDIT1,22,195,259,59,ES_MULTILINE | WS_VSCROLL
+    PUSHBUTTON      "截图",IDC_ScreenShot,290,133,59,15
+    GROUPBOX        "彩色摄像头",IDC_STATIC,19,10,266,181
+    GROUPBOX        "深度摄像头",IDC_STATIC,636,8,272,181
+    CONTROL         "",IDC_Cut,"Static",SS_BLACKRECT,361,19,259,162
+    GROUPBOX        "图片分析",IDC_STATIC,355,8,273,181
+    LTEXT           "坐标x:",IDC_STATIC,356,200,23,9
+    EDITTEXT        IDC_EY,454,198,37,15,ES_AUTOHSCROLL
+    LTEXT           "坐标y:",IDC_STATIC,428,200,23,9
+    EDITTEXT        IDC_ANGLE,524,197,37,15,ES_AUTOHSCROLL
+    LTEXT           "角度:",IDC_STATIC,502,200,20,9
+    EDITTEXT        IDC_WIDTH,591,197,37,15,ES_AUTOHSCROLL
+    LTEXT           "宽度:",IDC_STATIC,569,199,20,9
+    PUSHBUTTON      "确认",IDC_ANALY,430,225,59,15
+    PUSHBUTTON      "打开图片",IDC_BUTTON1,352,225,59,15
+    PUSHBUTTON      "复位",IDC_RESET,506,225,59,15
+    PUSHBUTTON      "发送消息",IDC_CONNECT,848,240,47,15
+    EDITTEXT        IDC_ESEND,654,200,239,37,ES_AUTOHSCROLL
+    PUSHBUTTON      "远程分析",IDC_REMOTE,576,225,59,15
+    EDITTEXT        IDC_EY2,382,197,37,15,ES_AUTOHSCROLL
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -339,6 +380,11 @@ BEGIN
     0
 END
 
+IDD_Kinect AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -356,6 +402,14 @@ BEGIN
     BEGIN
         RIGHTMARGIN, 392
         BOTTOMMARGIN, 200
+    END
+
+    IDD_Kinect, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 920
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 262
     END
 END
 #endif    // APSTUDIO_INVOKED

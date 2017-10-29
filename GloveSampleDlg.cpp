@@ -220,14 +220,39 @@ bool GloveSampleDlg::UpdateInputs()
 		SetDlgItemText(IDC_A13, acString_a);
 		strResult += acString_f;
 		// Gesture
+		CString str;
 		gesture = gpd.getGloveGesture(strResult);
-		if (gesture != -1) {
-			sprintf(acString, "%d", gesture);
+		switch (gesture)
+		{
+		case 0:
+			str = "¼·";
+			break;
+		case 1:
+			str = "¼Ð";
+			break;
+		case 3:
+			str = "Æ½";
+			break;
+		case 4:
+			str = "Ëº";
+			break;
+		case 5:
+			str = "ÍÆ";
+			break;
+		case 6:
+			str = "ÍÐ";
+			break;
+		case 7:
+			str = "ÎÕ";
+			break;
+		case 8:
+			str = "×¥";
+			break;
+		default:
+			str = " ";
+			break;
 		}
-		else {
-			sprintf(acString, "%s", "None");
-		}
-		SetDlgItemText(IDC_GESTURE, acString);
+		SetDlgItemText(IDC_GESTURE, str);
 		angle[14] = gpd.getTumbData(strTumb);
 		
 	}

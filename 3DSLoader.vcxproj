@@ -135,8 +135,8 @@
     <OutDir>.\Release\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>F:\Python27\include;G:\MATLAB\R2010b\extern\include;F:\3DSLoader\5DT\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\Python27\Lib;F:\Python27\libs;F:\3DSLoader\5DT\lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.14393.0\ucrt\x86;G:\MATLAB\R2010b\extern\lib\win64\microsoft;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\Python27\include;G:\MATLAB\R2010b\extern\include;F:\3DSLoader\5DT\inc;$(KINECTSDK10_DIR)\inc;G:\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\Python27\Lib;F:\Python27\libs;F:\3DSLoader\5DT\lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.14393.0\ucrt\x86;G:\MATLAB\R2010b\extern\lib\win64\microsoft;G:\opencv\build\x86\vc12\lib;$(KINECTSDK10_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -202,7 +202,7 @@
       <SubSystem>Windows</SubSystem>
       <OutputFile>.\Release\3DSLoader.exe</OutputFile>
       <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libmx.lib;libmat.lib;F:\3DSLoader\5DT\lib\fgloved.lib;libeng.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmx.lib;libmat.lib;F:\3DSLoader\5DT\lib\fgloved.lib;libeng.lib;python27.lib;opencv_ts300.lib;opencv_world300.lib;kernel32.lib;user32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Kinect10.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -429,11 +429,13 @@
     <ClCompile Include="3DSLoaderDoc.cpp" />
     <ClCompile Include="3DSLoaderView.cpp" />
     <ClCompile Include="3dsReader.cpp" />
+    <ClCompile Include="CvvImage.cpp" />
     <ClCompile Include="Filehelper.cpp" />
     <ClCompile Include="FingerStruc.cpp" />
     <ClCompile Include="getPythonData.cpp" />
     <ClCompile Include="GloableVariable.cpp" />
     <ClCompile Include="GloveSampleDlg.cpp" />
+    <ClCompile Include="KinectWin.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MatlabEngine.cpp" />
     <ClCompile Include="PublicFuntoinHelper.cpp" />
@@ -463,12 +465,14 @@
     <ClInclude Include="3DSLoaderView.h" />
     <ClInclude Include="3dsReader.h" />
     <ClInclude Include="basicRead.h" />
+    <ClInclude Include="CvvImage.h" />
     <ClInclude Include="Filehelper.h" />
     <ClInclude Include="FingerStruct.h" />
     <ClInclude Include="getPythonData.h" />
     <ClInclude Include="GloableVariable.h" />
     <ClInclude Include="GloveSampleDlg.h" />
     <ClInclude Include="glStructures.h" />
+    <ClInclude Include="KinectWin.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MatlabEngine.h" />
     <ClInclude Include="Resource.h" />

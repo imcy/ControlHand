@@ -25,8 +25,10 @@ BEGIN_MESSAGE_MAP(CMy3DSLoaderApp, CWinApp)
 	// Standard file based document commands
 	ON_COMMAND(ID_FILE_NEW, CWinApp::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, OnControl)
+	ON_COMMAND(ID_OPENGLOVE, OnControl)
 	// Standard print setup command
 	ON_COMMAND(ID_FILE_PRINT_SETUP, CWinApp::OnFilePrintSetup)
+	ON_COMMAND(ID_OPENK, &CMy3DSLoaderApp::OnOpenKinect)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -203,4 +205,13 @@ BOOL CMy3DSLoaderApp::OpenFile(CRobotHand& ctl, LPCTSTR lpszPathName)
 {
 	return true;
 	//return ((CMy3DSLoaderView*)((CFrameWnd*)m_pMainWnd)->GetActiveView())->OpenFile(0,lpszPathName);
+}
+
+
+void CMy3DSLoaderApp::OnOpenKinect()
+{
+	// TODO: 在此添加命令处理程序代码
+	kinwin = new KinectWin();
+	kinwin->Create(IDD_Kinect);
+	kinwin->ShowWindow(SW_SHOWNORMAL);
 }
