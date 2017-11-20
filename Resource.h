@@ -51,15 +51,17 @@
 #define IDC_SELF                        1035
 #define IDC_LIST1                       1036
 #define IDC_CHECK1                      1037
-#define IDC_EX                          1038
-#define IDC_ANGLE                       1039
-#define IDC_WIDTH                       1040
-#define IDC_ANALY                       1041
-#define IDC_RESET                       1042
-#define IDC_CONNECT                     1043
-#define IDC_ESEND                       1044
-#define IDC_REMOTE                      1045
-#define IDC_EY                          1046
+#define IDC_CLS                         1038
+#define IDC_EDIT2                       1039
+#define IDC_EA                          1039
+#define IDC_EDIT3                       1040
+#define IDC_EY                          1041
+#define IDC_COMBO1                      1041
+#define IDC_ANALY                       1042
+#define IDC_RESET                       1043
+#define IDC_CONNECT                     1044
+#define IDC_ESEND                       1045
+#define IDC_REMOTE                      1046
 #define IDC_EY2                         1047
 #define ID_Tongs                        32763
 #define ID_Rip                          32764
@@ -103,7 +105,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        138
 #define _APS_NEXT_COMMAND_VALUE         32798
-#define _APS_NEXT_CONTROL_VALUE         1038
+#define _APS_NEXT_CONTROL_VALUE         1042
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

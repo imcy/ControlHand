@@ -8,8 +8,12 @@
 
 SOCKET listen_sock;
 SOCKET sock;
+std::string colorImagePath2 = "./images/pcd0055r.png"; //初始化截图地址
+std::vector<std::string> result;
+bool analyFlag=false;
+bool imageFlag = false;
+bool methodFlag = true;//分析方法，表示是否用fast-rcnn分析
 // KinectWin 对话框
-
 IMPLEMENT_DYNAMIC(KinectWin, CDialogEx)
 
 KinectWin::KinectWin(CWnd* pParent /*=NULL*/)
@@ -151,19 +155,14 @@ void KinectWin::Update(CString str)
 	pEdit->SetSel(nLength, nLength);
 	pEdit->ReplaceSel(str + _T("\r\n"));
 }
-
-void KinectWin::UpdateOther(std::vector<std::string> res)
+void KinectWin::UpdateCls(CString cls)
 {
-	//将结果写入坐标框内
-	pX = (CEdit*)GetDlgItem(IDC_EY2);
-	pY = (CEdit*)GetDlgItem(IDC_EY);
-	pAngle = (CEdit*)GetDlgItem(IDC_ANGLE);
-	pWidth = (CEdit*)GetDlgItem(IDC_WIDTH);
-
-	pY->SetWindowText(CString(res[2].c_str()));
-	pAngle->SetWindowText(CString(res[3].c_str()));
-	pWidth->SetWindowText(CString(res[4].c_str()));
-	pX->SetWindowText(CString(res[1].c_str()));
+	//更新类别框
+	CEdit* pCls = (CEdit*)GetDlgItem(IDC_CLS);
+	int nLength = pCls->GetWindowTextLength();
+	//选定当前文本的末端  
+	pCls->SetSel(nLength, nLength);
+	pCls->ReplaceSel(cls + _T("\r\n"));
 }
 
 KinectWin::~KinectWin()
@@ -173,6 +172,7 @@ KinectWin::~KinectWin()
 void KinectWin::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_COMBO1, m_method);
 }
 
 
@@ -186,6 +186,9 @@ BEGIN_MESSAGE_MAP(KinectWin, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON5, &KinectWin::OnBnClickedButton5)
 	ON_BN_CLICKED(IDC_ScreenShot, &KinectWin::OnBnClickedScreenshot)
 	ON_BN_CLICKED(IDC_REMOTE, &KinectWin::OnBnClickedRemote)
+	ON_BN_CLICKED(IDC_ANALY, &KinectWin::OnBnClickedAnaly)
+	ON_BN_CLICKED(IDC_RESET, &KinectWin::OnBnClickedReset)
+	ON_CBN_SELCHANGE(IDC_COMBO1, &KinectWin::OnCbnSelchangeCombo1)
 END_MESSAGE_MAP()
 
 
@@ -195,6 +198,10 @@ BOOL KinectWin::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  在此添加额外的初始化
+	m_method.AddString("Faster RCNN");
+	m_method.AddString("SSD");
+	m_method.SetCurSel(0);
+
 	count = 0;
 	cvNamedWindow("view", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("depth", CV_WINDOW_AUTOSIZE);
@@ -211,9 +218,6 @@ BOOL KinectWin::OnInitDialog()
 
 	/*初始化所有编辑框*/
 	pEdit = (CEdit*)GetDlgItem(IDC_EDIT1);
-
-
-	colorImagePath = "./images/pcd000r.png"; //初始化截图地址
 	imageCut = NULL; //初始化原始图像
 
 	image.create(480, 640, CV_8UC3);
@@ -230,7 +234,7 @@ BOOL KinectWin::OnInitDialog()
 		Update("打开kinect成功");
 	}
 	/*socket部分*/
-	AfxBeginThread(&Server_Th, 0); //初始化socket
+	AfxBeginThread(&Server_Th, 0); //初始化socket线程
 	send_edit = (CEdit *)GetDlgItem(IDC_ESEND);
 	send_edit->SetFocus();
 
@@ -306,12 +310,28 @@ void KinectWin::DrawPicToHDC(IplImage * img, UINT ID)
 void KinectWin::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码	
+	/*
 	if (imageCut) cvReleaseImage(&imageCut);
 	imageCut = cvLoadImage(colorImagePath.c_str(), 1); //显示图片
 	DrawPicToHDC(imageCut, IDC_Cut);
-	Update("已打开截图图片");
-}
+	Update("已打开截图图片");*/
+	CString filter;
+	filter = "所有图片(*.png;*.jpg)||";
+	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, filter);
+	CString result;
+	CString strPath = "F:\\3DSLoader\\images\\";
+	dlg.m_ofn.lpstrInitialDir = strPath;//初始化路径。
+	if (dlg.DoModal() == IDOK)
+	{
+		result = dlg.GetPathName();
+		colorImagePath2 = result;
+	}
 
+	if (imageCut) cvReleaseImage(&imageCut);
+	imageCut = cvLoadImage(colorImagePath2.c_str(), 1); //显示图片
+	DrawPicToHDC(imageCut, IDC_Cut);
+	Update("已打开选择图片");
+}
 
 void KinectWin::OnBnClickedCancel2()
 {
@@ -321,7 +341,15 @@ void KinectWin::OnBnClickedCancel2()
 	/*if (SUCCEEDED(hr)) {
 	NuiShutdown();
 	}*/
-	DestroyWindow();
+	if (analyFlag) {
+		close(sock);
+		close(listen_sock);
+	}
+	else {
+		closesocket(sock);
+		closesocket(listen_sock);
+		this->PostMessage(WM_CLOSE, 0, 0);
+	}
 }
 
 
@@ -364,8 +392,8 @@ void KinectWin::OnBnClickedScreenshot()
 	std::string commonPathSuffix = ".png";
 	std::stringstream ss;
 	ss << basePath << "pcd00" << count << "r" << commonPathSuffix;
-	colorImagePath = ss.str();
-	imwrite(colorImagePath, image);
+	colorImagePath2 = ss.str();
+	imwrite(colorImagePath2, image);
 	/*
 	std::stringstream ssd;
 	ssd << basePath<<count<<"-" << depthPathPrefix << commonPathSuffix;
@@ -394,7 +422,6 @@ UINT Server_Th(LPVOID p)
 	char msg[1024];
 	HWND hWnd = ::FindWindow(NULL, _T("读取摄像头"));      //得到对话框的句柄
 	KinectWin * dlg = (KinectWin *)KinectWin::FromHandle(hWnd); //由句柄得到对话框的对象指针
-	//KinectWin * dlg = (KinectWin *)AfxGetApp()->GetMainWnd();
 	local_addr.sin_family = AF_INET;
 	local_addr.sin_port = htons(5150);
 	local_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -417,7 +444,6 @@ UINT Server_Th(LPVOID p)
 		CString port;
 		int temp = ntohs(client_addr.sin_port);
 		port.Format(_T("%d"), temp);
-		//port.Format("%d", int(ntohs(client_addr.sin_port)));
 		dlg->Update("已连接来自：" + CString(inet_ntoa(client_addr.sin_addr)) + "  端口：" + port);
 	}
 
@@ -434,10 +460,11 @@ UINT Server_Th(LPVOID p)
 			int temp = strlen(msg);
 			msg[temp] = '\0';
 			if (strcmp(msg, "leave") == 0) {
-				dlg->Update("失去连接");
+				AfxMessageBox(_T("失去连接！"));
 				break;
 			}
 			else if (strcmp(msg, "sendResult") == 0) {
+				analyFlag = true;
 				dlg->Update("准备获得分析结果");
 				memset(msg, 0, 1024);
 				res = recv(sock, msg, 1024, 0);
@@ -445,12 +472,11 @@ UINT Server_Th(LPVOID p)
 
 				// 以逗号为分隔符拆分字符串
 				std::string temp = msg;
-				std::vector<std::string> res;
 				int count = 0;
 				int head = 0;
 				for (int i = 0; i <= temp.length(); i++) {
 					if (i == temp.length() || temp[i] == ',') {
-						res.push_back(temp.substr(head, count));
+						result.push_back(temp.substr(head, count));
 						head = i + 1;
 						count = 0;
 					}
@@ -460,8 +486,9 @@ UINT Server_Th(LPVOID p)
 					}
 				}
 				//将结果写入坐标框内
-				dlg->UpdateOther(res);
-				//dlg->OnBnClickedAnaly();
+				dlg->UpdateCls("结果:" + CString(msg));
+				dlg->OnBnClickedAnaly();
+				result.clear();
 			}
 			else {
 				dlg->Update("client:" + CString(msg));
@@ -469,17 +496,34 @@ UINT Server_Th(LPVOID p)
 			}
 		}
 	}
+	
+	dlg->OnBnClickedCancel2();
 	return 0;
 }
 
 void KinectWin::OnBnClickedRemote()
 {
 	HANDLE hFile;
-	hFile = CreateFile(CString(colorImagePath.c_str()), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	imageFlag = false; //图片未分析
+	GetDlgItem(IDC_CLS)->SetWindowText(_T("")); //清空结果显示框
+
+	if (imageCut) cvReleaseImage(&imageCut);
+	imageCut = cvLoadImage(colorImagePath2.c_str(), 1); //显示图片
+	DrawPicToHDC(imageCut, IDC_Cut);
+	Update("已打开选择图片");
+
+	hFile = CreateFile(CString(colorImagePath2.c_str()), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	unsigned long long file_size = 0;
 	file_size = GetFileSize(hFile, NULL);
 	char buffer[BUFFER_SIZE];
-	const char * str = "sendImage";
+	const char * str;
+	if (methodFlag) {
+		str = "sendImage_f";
+	}
+	else
+	{
+		str = "sendImage_s";
+	}
 	//发送准备发送命令
 	memset(buffer, 0, BUFFER_SIZE);
 	strncpy(buffer, str, strlen(str));
@@ -514,4 +558,89 @@ void KinectWin::OnBnClickedRemote()
 	} while (dwNumberOfBytesRead);
 	CloseHandle(hFile);
 	Update("成功发送图片");
+}
+
+
+void KinectWin::OnBnClickedAnaly()
+{
+	CString x, y, angle, width;
+	float xRaw[4], yRaw[4];
+	float xNew[4], yNew[4];
+	float height = 33;
+	if (!imageFlag) {
+		imageCut = cvLoadImage(colorImagePath2.c_str(), 1); //显示图片
+		imageFlag = true;
+	}
+	if (result.size() < 4) {
+		AfxMessageBox("还未得到分析结果！");
+		return;
+	}
+	float xf = atof(result[1].c_str());
+	float yf = atof(result[2].c_str());
+	float anglef = atof(result[3].c_str());
+	float widthf = atof(result[4].c_str());
+
+
+	xRaw[1] = xf - 0.5*widthf;
+	yRaw[1] = yf - 0.5*height;
+
+	xRaw[0] = xf + 0.5*widthf;
+	yRaw[0] = yRaw[1];
+
+	xRaw[2] = xRaw[1];
+	yRaw[2] = yf + 0.5*height;
+
+	xRaw[3] = xRaw[0];
+	yRaw[3] = yRaw[2];
+
+
+
+	float anglePi = -anglef*pi / 180.0;
+	float cosA = cos(anglePi);
+	float sinA = sin(anglePi);
+
+	xNew[0] = (xRaw[0] - xf)*cosA - (yRaw[0] - yf)*sinA + xf;
+	yNew[0] = (xRaw[0] - xf)*sinA + (yRaw[0] - yf)*cosA + yf;
+
+	xNew[1] = (xRaw[1] - xf)*cosA - (yRaw[1] - yf)*sinA + xf;
+	yNew[1] = (xRaw[1] - xf)*sinA + (yRaw[1] - yf)*cosA + yf;
+
+	xNew[2] = (xRaw[2] - xf)*cosA - (yRaw[2] - yf)*sinA + xf;
+	yNew[2] = (xRaw[2] - xf)*sinA + (yRaw[2] - yf)*cosA + yf;
+
+	xNew[3] = (xRaw[3] - xf)*cosA - (yRaw[3] - yf)*sinA + xf;
+	yNew[3] = (xRaw[3] - xf)*sinA + (yRaw[3] - yf)*cosA + yf;
+
+	cvLine(imageCut, cvPoint(xNew[0], yNew[0]), cvPoint(xNew[1], yNew[1]), cvScalar(0, 0, 255), 3);
+	cvLine(imageCut, cvPoint(xNew[1], yNew[1]), cvPoint(xNew[2], yNew[2]), cvScalar(255, 0, 0), 3);
+	cvLine(imageCut, cvPoint(xNew[2], yNew[2]), cvPoint(xNew[3], yNew[3]), cvScalar(0, 0, 255), 3);
+	cvLine(imageCut, cvPoint(xNew[0], yNew[0]), cvPoint(xNew[3], yNew[3]), cvScalar(255, 0, 0), 3);
+
+	DrawPicToHDC(imageCut, IDC_Cut);
+	Update("图片已修改");
+}
+
+void KinectWin::OnBnClickedReset()
+{
+	//复位图片
+	if (imageCut) cvReleaseImage(&imageCut);
+	imageCut = cvLoadImage(colorImagePath2.c_str(), 1); //显示图片
+	DrawPicToHDC(imageCut, IDC_Cut);
+	Update("图片已复位");
+}
+
+
+void KinectWin::OnCbnSelchangeCombo1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int nIndex = m_method.GetCurSel();
+	if (nIndex == 0) {
+		methodFlag = true;
+		Update("选择Faster RCNN方法分析");
+	}
+	else
+	{
+		Update("选择SSD方法分析");
+		methodFlag = false;
+	}
 }

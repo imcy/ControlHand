@@ -4,6 +4,8 @@
 #include <NuiApi.h> 
 #include "CvvImage.h"
 #include "winsock2.h" 
+#include "afxwin.h"
+#define pi 3.1415926
 
 // KinectWin ¶Ô»°¿ò
 UINT Server_Th(LPVOID p);
@@ -28,13 +30,8 @@ public:
 	int xd;
 	int yd;
 	CEdit * send_edit; //·¢ËÍ¿ò
-	std::string colorImagePath; //½ØÍ¼Í¼Æ¬Â·¾¶
 	IplImage *imageCut; //½ØÍ¼Í¼Æ¬
 	CEdit* pEdit;
-	CEdit* pX;
-	CEdit* pY;
-	CEdit* pAngle;
-	CEdit* pWidth;
 	int count;
 	void DrawPicToHDC(IplImage *img, UINT ID);
 
@@ -43,8 +40,8 @@ public:
 	void CaptureKinectVideo();
 	void CaptureKinectDepthVideo();
 	void Update(CString str);
+	void UpdateCls(CString cls);
 
-	void UpdateOther(std::vector<std::string> res);
 	
 	virtual ~KinectWin();
 
@@ -67,4 +64,8 @@ public:
 	afx_msg void OnBnClickedButton5();
 	afx_msg void OnBnClickedScreenshot();
 	afx_msg void OnBnClickedRemote();
+	afx_msg void OnBnClickedAnaly();
+	afx_msg void OnBnClickedReset();
+	CComboBox m_method;
+	afx_msg void OnCbnSelchangeCombo1();
 };
