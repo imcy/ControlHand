@@ -1,6 +1,8 @@
 #pragma once
 #include "fglove.h"
 #include "getPythonData.h"
+#include "LineChart.h"
+
 
 // GloveSampleDlg 对话框
 
@@ -11,7 +13,8 @@ class GloveSampleDlg : public CDialogEx
 public:
 	GloveSampleDlg(CWnd* pParent = NULL);   // 标准构造函数
 	bool UpdateInputs();
-	fdGlove *m_pGlove;
+	fdGlove *m_pGlove;	//数据手套窗口指针
+	CLineChart *lineChart;	//曲线图窗口指针
 	CListBox	m_ComList;
 	CListBox	m_ComList_gesture;
 	CCheckListBox m_check;
@@ -43,4 +46,5 @@ public:
 	afx_msg void OnClickedSendGesture();
 	afx_msg void OnSendAngle();
 	afx_msg void OnClickedSynchronize();
+	afx_msg void OnBnClickedDrawline();
 };

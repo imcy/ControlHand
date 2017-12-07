@@ -135,8 +135,8 @@
     <OutDir>.\Release\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>F:\Python27\include;G:\MATLAB\R2010b\extern\include;F:\3DSLoader\5DT\inc;$(KINECTSDK10_DIR)\inc;G:\opencv\build\include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\Python27\Lib;F:\Python27\libs;F:\3DSLoader\5DT\lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.14393.0\ucrt\x86;G:\MATLAB\R2010b\extern\lib\win64\microsoft;G:\opencv\build\x86\vc12\lib;$(KINECTSDK10_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\Python27\include;G:\MATLAB\R2017a\extern\include;F:\3DSLoader\5DT\inc;$(KINECTSDK10_DIR)\inc;G:\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\Python27\Lib;F:\Python27\libs;F:\3DSLoader\5DT\lib;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.14393.0\ucrt\x86;G:\MATLAB\R2017a\extern\lib\win64\microsoft;G:\opencv\build\x86\vc12\lib;$(KINECTSDK10_DIR)\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -436,6 +436,7 @@
     <ClCompile Include="GloableVariable.cpp" />
     <ClCompile Include="GloveSampleDlg.cpp" />
     <ClCompile Include="KinectWin.cpp" />
+    <ClCompile Include="LineChart.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MatlabEngine.cpp" />
     <ClCompile Include="PublicFuntoinHelper.cpp" />
@@ -455,6 +456,7 @@
     </ClCompile>
     <ClCompile Include="RobotHand.cpp" />
     <ClCompile Include="Knuckle.cpp" />
+    <ClCompile Include="tchart1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="3DSLoader.rc" />
@@ -465,6 +467,8 @@
     <ClInclude Include="3DSLoaderView.h" />
     <ClInclude Include="3dsReader.h" />
     <ClInclude Include="basicRead.h" />
+    <ClInclude Include="CSeries.h" />
+    <ClInclude Include="CTChart.h" />
     <ClInclude Include="CvvImage.h" />
     <ClInclude Include="Filehelper.h" />
     <ClInclude Include="FingerStruct.h" />
@@ -473,6 +477,7 @@
     <ClInclude Include="GloveSampleDlg.h" />
     <ClInclude Include="glStructures.h" />
     <ClInclude Include="KinectWin.h" />
+    <ClInclude Include="LineChart.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MatlabEngine.h" />
     <ClInclude Include="Resource.h" />
@@ -480,6 +485,7 @@
     <ClInclude Include="RobotHand.h" />
     <ClInclude Include="Knuckle.h" />
     <ClInclude Include="PublicFuntoinHelper.h" />
+    <ClInclude Include="tchart1.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\3DSLoader.ico" />
@@ -497,7 +503,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties RESOURCE_FILE="3DSLoader.rc" />
+      <UserProperties RESOURCE_FILE="3DSLoader.rc" _x007B_B6C10489-FB89-11D4-93C9-006008A7EED4_x007D_="CTchart1" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

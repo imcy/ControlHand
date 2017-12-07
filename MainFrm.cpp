@@ -77,7 +77,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
-LRESULT CMainFrame::MyMsgHandler(WPARAM, LPARAM)
+LRESULT CMainFrame::MyMsgHandler(WPARAM, LPARAM)	//消息处理1
 {
 	CMainFrame *pMain = (CMainFrame *)AfxGetApp()->m_pMainWnd;
 	((CMy3DSLoaderApp*)AfxGetApp())->OnTest();
@@ -85,7 +85,7 @@ LRESULT CMainFrame::MyMsgHandler(WPARAM, LPARAM)
 	return 0;
 }
 
-LRESULT CMainFrame::MyMsgHandler2(WPARAM, LPARAM)
+LRESULT CMainFrame::MyMsgHandler2(WPARAM, LPARAM)	//消息处理2，同步角度
 {
 	CMainFrame *pMain = (CMainFrame *)AfxGetApp()->m_pMainWnd;
 	((CMy3DSLoaderApp*)AfxGetApp())->OnAngle();

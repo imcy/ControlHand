@@ -9,6 +9,7 @@
 #define IDR_MENU1                       132
 #define IDD_DIALOG_RobotControl         133
 #define IDD_Kinect                      134
+#define IDD_DRAW                        139
 #define IDC_ScreenShot                  1002
 #define IDC_LIST2                       1003
 #define IDC_Dept                        1003
@@ -49,6 +50,7 @@
 #define IDC_BUTTON1                     1034
 #define IDC_BUTTON2                     1035
 #define IDC_SELF                        1035
+#define IDC_DRAWLINE                    1035
 #define IDC_LIST1                       1036
 #define IDC_CHECK1                      1037
 #define IDC_CLS                         1038
@@ -58,11 +60,17 @@
 #define IDC_EY                          1041
 #define IDC_COMBO1                      1041
 #define IDC_ANALY                       1042
+#define IDC_TCHART1                     1042
 #define IDC_RESET                       1043
+#define IDC_TCHART2                     1043
 #define IDC_CONNECT                     1044
+#define IDC_TCHART3                     1044
 #define IDC_ESEND                       1045
+#define IDC_TCHART4                     1045
 #define IDC_REMOTE                      1046
+#define IDC_TCHART5                     1046
 #define IDC_EY2                         1047
+#define IDC_TCHART6                     1047
 #define ID_Tongs                        32763
 #define ID_Rip                          32764
 #define ID_Cut                          32765
@@ -103,9 +111,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        138
+#define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         32798
-#define _APS_NEXT_CONTROL_VALUE         1042
+#define _APS_NEXT_CONTROL_VALUE         1044
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

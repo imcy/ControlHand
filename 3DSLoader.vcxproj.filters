@@ -66,6 +66,12 @@
     <ClCompile Include="CvvImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LineChart.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tchart1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="3DSLoader.rc">
@@ -131,6 +137,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CvvImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTChart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CSeries.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LineChart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tchart1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

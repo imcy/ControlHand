@@ -8,6 +8,7 @@
 #include "MainFrm.h"
 
 
+
 // GloveSampleDlg 对话框
 
 IMPLEMENT_DYNAMIC(GloveSampleDlg, CDialogEx)
@@ -36,6 +37,7 @@ BEGIN_MESSAGE_MAP(GloveSampleDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &GloveSampleDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDC_BUTTON1, &GloveSampleDlg::OnClickedSendGesture)
 	ON_BN_CLICKED(IDC_CHECK1, &GloveSampleDlg::OnClickedSynchronize)
+	ON_BN_CLICKED(IDC_DRAWLINE, &GloveSampleDlg::OnBnClickedDrawline)
 END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CGloveSampleDlg message handlers
@@ -400,4 +402,13 @@ void GloveSampleDlg::OnClickedSynchronize()
 	{
 		isSynchronize = false;
 	}
+}
+
+
+void GloveSampleDlg::OnBnClickedDrawline()
+{
+	// 打开曲线绘制窗口
+	lineChart = new CLineChart(this);
+	lineChart->Create(IDD_DRAW);
+	lineChart->ShowWindow(SW_SHOWNORMAL);
 }
