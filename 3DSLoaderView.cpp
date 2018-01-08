@@ -578,8 +578,6 @@ BOOL CMy3DSLoaderView::OpenFile(CRobotHand& ctl,LPCTSTR lpszPathName)
 
 	C3dsReader Loader;
 	BOOL result;
-	//if( m_RobotHand.getNumObjects() > 0 ) m_RobotHand.removeAllObjects();
-
 	result = Loader.Reader(file, &ctl);
 	if (result)
 	{
@@ -599,6 +597,7 @@ void CMy3DSLoaderView::reset()
 		m_RobotHand.objects[i]->currentPos.x = CGloableVariable::defaultPos[i][0] - 150;
 		m_RobotHand.objects[i]->currentPos.y = CGloableVariable::defaultPos[i][1];
 		m_RobotHand.objects[i]->currentPos.z = CGloableVariable::defaultPos[i][2];
+		
 	}
 	int j = 0;
 	for (int i = CGloableVariable::N; i < CGloableVariable::N + 21; i++)//右手部分
@@ -622,11 +621,13 @@ void CMy3DSLoaderView::reset()
 	{
 		if (i == 1 || i == 2 || i == 3 || i == 4)
 		{
+			//angle.push_back(m_RobotHand.objects[i]->sceneRot[0]);
 			m_RobotHand.objects[i]->sceneRot[2] = m_RobotHand.ConvertAngleToRadian(60);
 			m_RobotHand.objects[1]->angle = m_RobotHand.ConvertAngleToRadian(60);
 		}
-		else
+		else {
 			m_RobotHand.objects[i]->sceneRot[2] = 0;
+		}
 		m_RobotHand.objects[i]->sceneRot[1] = 0;
 
 		m_RobotHand.objects[i]->sceneRot[0] = 0;
@@ -649,15 +650,34 @@ void CMy3DSLoaderView::reset()
 	}
 }
 
+void CMy3DSLoaderView::GetAngle()
+{
+	/*抓取*/
+	ofile.open("angle.txt");
+	ofile << "left:" << endl;
+	for (int i = 0; i < 21; i++)
+	{
+		if (i!=0 && i % 4 == 0)
+			ofile << endl;
+		ofile << angleLeft[i] << " ";
+	}
+	ofile << endl;
+	ofile << "right:" << endl;
+	for (int i = 0; i < 21; i++)
+	{
+		if (i != 0 && i % 4 == 0)
+			ofile << endl;
+		ofile << angleRight[i] << " ";
+	}
+	ofile.close();
+}
+
 //////////////////////////////////////////////////////////////////////////
 //			测试
 //////////////////////////////////////////////////////////////////////////
 /*抓动作*/
 void CMy3DSLoaderView::OnGrab(){
 	reset();
-	ofile.open("./angle.txt", std::ios::ate | std::ios::out);     //作为输出文件打开
-	/*抓取*/
-	ofile << "抓" << endl;
 	//中指
 	int choice[5] = { 0,0,1,0,0 };
 	float* res = m_RobotHand.CalculateThetaByCoordinate(tVector(0.669, 125.957, -40.0), choice);
@@ -666,19 +686,30 @@ void CMy3DSLoaderView::OnGrab(){
 	float angle1 = -*(res + 1);
 	float angle2 = *(res + 2);
 	float angle3 = *(res + 3);
-	str.Format("%f,%f,%f,%f", angle0, angle1, angle2, angle3);
-	//	PublicFuntoinHelper::ShowMessage(str);
-	ofile << "中指:" << angle0 <<" "<< angle1 <<" "<< angle2 <<" "<< angle3 << endl;
 
 	m_RobotHand.Middle1_Rotate(angle0);
 	m_RobotHand.Middle2_Rotate(angle1);
-	m_RobotHand.Middle3_Rotate(angle1 + angle2);
-	m_RobotHand.Middle4_Rotate(angle1 + angle2 + angle3);
+	m_RobotHand.Middle3_Rotate(angle1+angle2);
+	m_RobotHand.Middle4_Rotate(angle1 + angle2+angle3);
 
 	m_RobotHand.Middle1_Rotate_r(angle0); //右手部分
 	m_RobotHand.Middle2_Rotate_r(angle1);
 	m_RobotHand.Middle3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Middle4_Rotate_r(angle1 + angle2 + angle3);
+	
+	{
+		//为angle矩阵赋值
+		angleLeft[8] = angle0;
+		angleLeft[9] = angle1;
+		angleLeft[10] = angle2;
+		angleLeft[11] = angle3;
+
+		//为angle矩阵赋值
+		angleRight[8] = angle0;
+		angleRight[9] = angle1;
+		angleRight[10] = angle2;
+		angleRight[11] = angle3;
+	}
 
 	//无名指
 	choice[3] = 1; choice[2] = 0;
@@ -688,9 +719,6 @@ void CMy3DSLoaderView::OnGrab(){
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	str.Format("%f,%f,%f,%f", angle0, angle1, angle2, angle3);
-	//	PublicFuntoinHelper::ShowMessage(str);
-	ofile << "无名指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 
 	m_RobotHand.Ring1_Rotate(angle0);
 	m_RobotHand.Ring2_Rotate(angle1);
@@ -702,6 +730,20 @@ void CMy3DSLoaderView::OnGrab(){
 	m_RobotHand.Ring3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Ring4_Rotate_r(angle1 + angle2 + angle3);
 
+	{
+		//为angle矩阵赋值
+		angleLeft[12] = angle0;
+		angleLeft[13] = angle1;
+		angleLeft[14] = angle2;
+		angleLeft[15] = angle3;
+
+		//为angle矩阵赋值
+		angleRight[12] = angle0;
+		angleRight[13] = angle1;
+		angleRight[14] = angle2;
+		angleRight[15] = angle3;
+	}
+
 	//食指
 	choice[1] = 1; choice[3] = 0;
 	res = m_RobotHand.CalculateThetaByCoordinate(tVector(20.941, 125.957, -40.0), choice);
@@ -712,7 +754,6 @@ void CMy3DSLoaderView::OnGrab(){
 	angle3 = *(res + 3);
 	str.Format("%f,%f,%f,%f", angle0, angle1, angle2, angle3);
 	//	PublicFuntoinHelper::ShowMessage(str);
-	ofile << "食指:" << angle0 << " " << angle1 << " " << angle2 << " " << angle3 << endl;
 
 	m_RobotHand.Index1_Rotate(angle0);
 	m_RobotHand.Index2_Rotate(angle1);
@@ -724,6 +765,19 @@ void CMy3DSLoaderView::OnGrab(){
 	m_RobotHand.Index3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Index4_Rotate_r(angle1 + angle2 + angle3);
 	
+	{
+		//为angle矩阵赋值
+		angleLeft[4] = angle0;
+		angleLeft[5] = angle1;
+		angleLeft[6] = angle2;
+		angleLeft[7] = angle3;
+
+		//为angle矩阵赋值
+		angleRight[4] = angle0;
+		angleRight[5] = angle1;
+		angleRight[6] = angle2;
+		angleRight[7] = angle3;
+	}
 	//小指
 	choice[4] = 1; choice[1] = 0;
 	res = m_RobotHand.CalculateThetaByCoordinate(tVector(-43.541, 125.957, -40.0), choice);
@@ -734,7 +788,6 @@ void CMy3DSLoaderView::OnGrab(){
 	angle3 = *(res + 3);
 	str.Format("%f,%f,%f,%f", angle0, angle1, angle2, angle3);
 	//	PublicFuntoinHelper::ShowMessage(str);
-	ofile << "小指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 
 	m_RobotHand.Little1_Rotate(angle0);
 	m_RobotHand.Little2_Rotate(angle1);
@@ -746,8 +799,19 @@ void CMy3DSLoaderView::OnGrab(){
 	m_RobotHand.Little3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Little4_Rotate_r(angle1 + angle2 + angle3);
 
-	//大拇指正向控制
-	ofile << "大拇指:" << 5 << " " << 10 << " " << 50 << " " << 30 << endl;
+	{
+		//为angle矩阵赋值
+		angleLeft[16] = angle0;
+		angleLeft[17] = angle1;
+		angleLeft[18] = angle2;
+		angleLeft[19] = angle3;
+
+		//为angle矩阵赋值
+		angleRight[16] = angle0;
+		angleRight[17] = angle1;
+		angleRight[18] = angle2;
+		angleRight[19] = angle3;
+	}
 
 	m_RobotHand.Thumb1_Rotate(5);
 	m_RobotHand.Thumb2_Rotate(10);
@@ -759,12 +823,31 @@ void CMy3DSLoaderView::OnGrab(){
 	m_RobotHand.Thumb3_Rotate_r(60);
 	m_RobotHand.Thumb4_Rotate_r(90);
 
+	{
+		//为angle矩阵赋值
+		angleLeft[0] = 5;
+		angleLeft[1] = 10;
+		angleLeft[2] = 50;
+		angleLeft[3] = 30;
+
+		//为angle矩阵赋值
+		angleRight[0] = 5;
+		angleRight[1] = 10;
+		angleRight[2] = 50;
+		angleRight[3] = 30;
+	}
+
 	m_RobotHand.Thumb_Rotate_b(40);
 	m_RobotHand.Thumb_Rotate_br(40);
 
+	{
+		//为angle矩阵赋值
+		angleLeft[20] = 40;
+		angleRight[20] = 40;
+	}
+
 	m_RobotHand.drawGL();
 	RenderScene();
-	ofile.close();
 }
 /*推动作*/
 void CMy3DSLoaderView::OnPush() {
@@ -779,6 +862,17 @@ void CMy3DSLoaderView::OnPush() {
 	m_RobotHand.Thumb2_Rotate_r(-20);
 	m_RobotHand.Thumb3_Rotate_r(20);
 	m_RobotHand.Thumb4_Rotate_r(25);
+	//为angle矩阵赋值
+	angleLeft[0] = -20;
+	angleLeft[1] = -20;
+	angleLeft[2] = 40;
+	angleLeft[3] = 5;
+	//为angle矩阵赋值
+	angleRight[0] = -20;
+	angleRight[1] = -20;
+	angleRight[2] = 40;
+	angleRight[3] = 5;
+
 	//食指
 	m_RobotHand.Index1_Rotate(-5);
 	m_RobotHand.Index2_Rotate(-15);
@@ -789,6 +883,17 @@ void CMy3DSLoaderView::OnPush() {
 	m_RobotHand.Index2_Rotate_r(-15);
 	m_RobotHand.Index3_Rotate_r(15);
 	m_RobotHand.Index4_Rotate_r(15);
+	//为angle矩阵赋值
+	angleLeft[4] = -5;
+	angleLeft[5] = -15;
+	angleLeft[6] = 30;
+	angleLeft[7] = 0;
+	//为angle矩阵赋值
+	angleRight[4] = -5;
+	angleRight[5] = -15;
+	angleRight[6] = 30;
+	angleRight[7] = 0;
+
 	//中指
 	m_RobotHand.Middle1_Rotate(0);
 	m_RobotHand.Middle2_Rotate(-15);
@@ -799,6 +904,16 @@ void CMy3DSLoaderView::OnPush() {
 	m_RobotHand.Middle2_Rotate_r(-15);
 	m_RobotHand.Middle3_Rotate_r(15);
 	m_RobotHand.Middle4_Rotate_r(15);
+	//为angle矩阵赋值
+	angleLeft[8] = 0;
+	angleLeft[9] = -15;
+	angleLeft[10] = 30;
+	angleLeft[11] = 0;
+	//为angle矩阵赋值
+	angleRight[8] = 0;
+	angleRight[9] = -15;
+	angleRight[10] = 30;
+	angleRight[11] = 0;
 	
 	//无名指
 	m_RobotHand.Ring1_Rotate(5);
@@ -810,6 +925,16 @@ void CMy3DSLoaderView::OnPush() {
 	m_RobotHand.Ring2_Rotate_r(-15);
 	m_RobotHand.Ring3_Rotate_r(15);
 	m_RobotHand.Ring4_Rotate_r(15);
+	//为angle矩阵赋值
+	angleLeft[12] = 5;
+	angleLeft[13] = -15;
+	angleLeft[14] = 30;
+	angleLeft[15] = 0;
+	//为angle矩阵赋值
+	angleRight[12] = 5;
+	angleRight[13] = -15;
+	angleRight[14] = 30;
+	angleRight[15] = 0;
 	
 	//小指
 	m_RobotHand.Little1_Rotate(5);
@@ -821,6 +946,16 @@ void CMy3DSLoaderView::OnPush() {
 	m_RobotHand.Little2_Rotate_r(-15);
 	m_RobotHand.Little3_Rotate_r(15);
 	m_RobotHand.Little4_Rotate_r(15);
+	//为angle矩阵赋值
+	angleLeft[16] = 5;
+	angleLeft[17] = -15;
+	angleLeft[18] = 30;
+	angleLeft[19] = 0;
+	//为angle矩阵赋值
+	angleRight[16] = 5;
+	angleRight[17] = -15;
+	angleRight[18] = 30;
+	angleRight[19] = 0;
 
 	m_RobotHand.drawGL();
 	RenderScene();
@@ -828,11 +963,6 @@ void CMy3DSLoaderView::OnPush() {
 /*夹动作*/
 void CMy3DSLoaderView::OnClamp() {
 	reset();
-	//ofile.open("./angle.txt", ios::out | ios::app);     //作为输出文件打开
-	//ofile << "夹" << endl;
-	/*大拇指运动*/
-	//ofile << "大拇指:" << 5 << " " << 0 << " " << 50 << " " << 0 << endl;
-
 	m_RobotHand.Thumb1_Rotate(5);
 	m_RobotHand.Thumb3_Rotate(50);
 	m_RobotHand.Thumb4_Rotate(50);
@@ -841,8 +971,21 @@ void CMy3DSLoaderView::OnClamp() {
 	m_RobotHand.Thumb3_Rotate_r(50);
 	m_RobotHand.Thumb4_Rotate_r(50);
 
+	//为angle矩阵赋值
+	angleLeft[0] = 5;
+	angleLeft[2] = 50;
+	angleLeft[3] = 0;
+	//为angle矩阵赋值
+	angleRight[0] = 5;
+	angleRight[2] = 50;
+	angleRight[3] = 0;
+
 	m_RobotHand.Thumb_Rotate_b(60);
 	m_RobotHand.Thumb_Rotate_br(60);
+	//为angle矩阵赋值
+	angleLeft[20] = 60;
+	angleRight[20] = 60;
+
 
 	/*抓取*/
 	//中指
@@ -853,19 +996,29 @@ void CMy3DSLoaderView::OnClamp() {
 	float angle1 = -*(res + 1);
 	float angle2 = *(res + 2);
 	float angle3 = *(res + 3);
-	str.Format("%f,%f,%f,%f", angle0, angle1, angle2, angle3);
-	//	PublicFuntoinHelper::ShowMessage(str);
-	//ofile << "中指:" << angle0 << " " << angle1 << " " << angle2 << " " <<  angle3 << endl;
+
 
 	m_RobotHand.Middle1_Rotate(angle0);
 	m_RobotHand.Middle2_Rotate(angle1);
-	m_RobotHand.Middle3_Rotate(angle1 + angle2);
+	m_RobotHand.Middle3_Rotate(angle2);
 	m_RobotHand.Middle4_Rotate(angle1 + angle2 + angle3);
 
 	m_RobotHand.Middle1_Rotate_r(angle0); //右手部分
 	m_RobotHand.Middle2_Rotate_r(angle1);
 	m_RobotHand.Middle3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Middle4_Rotate_r(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[8] = angle0;
+		angleLeft[9] = angle1;
+		angleLeft[10] =angle2;
+		angleLeft[11] =  angle3;
+		//为angle矩阵赋值
+		angleRight[8] = angle0;
+		angleRight[9] = angle1;
+		angleRight[10] = angle2;
+		angleRight[11] = angle3;
+	}
 
 	//无名指
 	choice[3] = 1; choice[2] = 0;
@@ -875,9 +1028,6 @@ void CMy3DSLoaderView::OnClamp() {
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	str.Format("%f,%f,%f,%f", angle0, angle1, angle2, angle3);
-	//	PublicFuntoinHelper::ShowMessage(str);
-	//ofile << "无名指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 
 	m_RobotHand.Ring1_Rotate(angle0);
 	m_RobotHand.Ring2_Rotate(angle1);
@@ -888,6 +1038,18 @@ void CMy3DSLoaderView::OnClamp() {
 	m_RobotHand.Ring2_Rotate_r(angle1);
 	m_RobotHand.Ring3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Ring4_Rotate_r(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[12] = angle0;
+		angleLeft[13] = angle1;
+		angleLeft[14] = angle2;
+		angleLeft[15] = angle3;
+		//为angle矩阵赋值
+		angleRight[12] = angle0;
+		angleRight[13] = angle1;
+		angleRight[14] = angle2;
+		angleRight[15] = angle3;
+	}
 
 	//食指
 	choice[1] = 1; choice[3] = 0;
@@ -897,9 +1059,6 @@ void CMy3DSLoaderView::OnClamp() {
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	str.Format("%f,%f,%f,%f", angle0, angle1, angle2, angle3);
-	//	PublicFuntoinHelper::ShowMessage(str);
-	//ofile << "食指:" << angle0 << " " << angle1 << " " << angle2 << " " <<  angle3 << endl;
 
 	m_RobotHand.Index1_Rotate(angle0);
 	m_RobotHand.Index2_Rotate(angle1);
@@ -910,6 +1069,18 @@ void CMy3DSLoaderView::OnClamp() {
 	m_RobotHand.Index2_Rotate_r(angle1);
 	m_RobotHand.Index3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Index4_Rotate_r(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[4] = angle0;
+		angleLeft[5] = angle1;
+		angleLeft[6] = angle2;
+		angleLeft[7] = angle3;
+		//为angle矩阵赋值
+		angleRight[4] = angle0;
+		angleRight[5] = angle1;
+		angleRight[6] = angle2;
+		angleRight[7] = angle3;
+	}
 
 	//小指
 	choice[4] = 1; choice[1] = 0;
@@ -919,9 +1090,6 @@ void CMy3DSLoaderView::OnClamp() {
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	str.Format("%f,%f,%f,%f", angle0, angle1, angle2, angle3);
-	//	PublicFuntoinHelper::ShowMessage(str);
-	//ofile << "小指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 
 	m_RobotHand.Little1_Rotate(angle0);
 	m_RobotHand.Little2_Rotate(angle1);
@@ -932,16 +1100,25 @@ void CMy3DSLoaderView::OnClamp() {
 	m_RobotHand.Little2_Rotate_r(angle1);
 	m_RobotHand.Little3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Little4_Rotate_r(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[16] = angle0;
+		angleLeft[17] = angle1;
+		angleLeft[18] = angle2;
+		angleLeft[19] = angle3;
+		//为angle矩阵赋值
+		angleRight[16] = angle0;
+		angleRight[17] = angle1;
+		angleRight[18] = angle2;
+		angleRight[19] = angle3;
+	}
 
 	m_RobotHand.drawGL();
 	RenderScene();
-	//ofile.close();
 }
 /*握*/
 void CMy3DSLoaderView::OnFist() {
 	reset();
-	ofile.open("./angle.txt", ios::out | ios::app);     //作为输出文件打开
-	ofile << "握" << endl;
 	//中指
 	int choice[5] = { 0,0,1,0,0 };
 	float* res = m_RobotHand.CalculateThetaByCoordinate(tVector(0.669, 30.0, -40.0), choice);
@@ -951,8 +1128,6 @@ void CMy3DSLoaderView::OnFist() {
 	float angle2 = *(res + 2);
 	float angle3 = *(res + 3);
 	
-	ofile << "中指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
-
 	m_RobotHand.Middle1_Rotate(angle0);
 	m_RobotHand.Middle2_Rotate(angle1);
 	m_RobotHand.Middle3_Rotate(angle1 + angle2);
@@ -962,6 +1137,18 @@ void CMy3DSLoaderView::OnFist() {
 	m_RobotHand.Middle2_Rotate_r(angle1);
 	m_RobotHand.Middle3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Middle4_Rotate_r(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[8] = angle0;
+		angleLeft[9] = angle1;
+		angleLeft[10] = angle2;
+		angleLeft[11] = angle3;
+		//为angle矩阵赋值
+		angleRight[8] = angle0;
+		angleRight[9] = angle1;
+		angleRight[10] = angle2;
+		angleRight[11] = angle3;
+	}
 
 	//无名指
 	choice[3] = 1; choice[2] = 0;
@@ -971,8 +1158,6 @@ void CMy3DSLoaderView::OnFist() {
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	
-	ofile << "无名指:" << angle0 << " " << angle1 << " " << angle2 << " " <<  angle3 << endl;
 
 	m_RobotHand.Ring1_Rotate(angle0);
 	m_RobotHand.Ring2_Rotate(angle1);
@@ -983,7 +1168,18 @@ void CMy3DSLoaderView::OnFist() {
 	m_RobotHand.Ring2_Rotate_r(angle1);
 	m_RobotHand.Ring3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Ring4_Rotate_r(angle1 + angle2 + angle3);
-
+	{
+		//为angle矩阵赋值
+		angleLeft[12] = angle0;
+		angleLeft[13] = angle1;
+		angleLeft[14] = angle2;
+		angleLeft[15] = angle3;
+		//为angle矩阵赋值
+		angleRight[12] = angle0;
+		angleRight[13] = angle1;
+		angleRight[14] = angle2;
+		angleRight[15] = angle3;
+	}
 	//食指
 	choice[1] = 1; choice[3] = 0;
 	res = m_RobotHand.CalculateThetaByCoordinate(tVector(20.941, 30.0, -20.0), choice);
@@ -992,8 +1188,6 @@ void CMy3DSLoaderView::OnFist() {
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-
-	ofile << "食指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 
 	m_RobotHand.Index1_Rotate(angle0);
 	m_RobotHand.Index2_Rotate(angle1);
@@ -1004,6 +1198,18 @@ void CMy3DSLoaderView::OnFist() {
 	m_RobotHand.Index2_Rotate_r(angle1);
 	m_RobotHand.Index3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Index4_Rotate_r(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[4] = angle0;
+		angleLeft[5] = angle1;
+		angleLeft[6] = angle2;
+		angleLeft[7] = angle3;
+		//为angle矩阵赋值
+		angleRight[4] = angle0;
+		angleRight[5] = angle1;
+		angleRight[6] = angle2;
+		angleRight[7] = angle3;
+	}
 	//小指
 	choice[4] = 1; choice[1] = 0;
 	res = m_RobotHand.CalculateThetaByCoordinate(tVector(-43.541, 30.0, -30.0), choice);
@@ -1013,8 +1219,6 @@ void CMy3DSLoaderView::OnFist() {
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
 
-	ofile << "小指:" << angle0 << " " << angle1 << " " << angle2 << " " <<  angle3 << endl;
-	
 	m_RobotHand.Little1_Rotate(angle0);
 	m_RobotHand.Little2_Rotate(angle1);
 	m_RobotHand.Little3_Rotate(angle1 + angle2);
@@ -1024,6 +1228,18 @@ void CMy3DSLoaderView::OnFist() {
 	m_RobotHand.Little2_Rotate_r(angle1);
 	m_RobotHand.Little3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Little4_Rotate_r(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[16] = angle0;
+		angleLeft[17] = angle1;
+		angleLeft[18] = angle2;
+		angleLeft[19] = angle3;
+		//为angle矩阵赋值
+		angleRight[16] = angle0;
+		angleRight[17] = angle1;
+		angleRight[18] = angle2;
+		angleRight[19] = angle3;
+	}
 
 	//大拇指
 	choice[0] = 1; choice[4] = 0;
@@ -1034,8 +1250,6 @@ void CMy3DSLoaderView::OnFist() {
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
 
-	ofile << "大拇指:" << angle0 << " " << angle1 << " " <<  angle2 << " " << angle3 << endl;
-	
 	m_RobotHand.Thumb1_Rotate(angle0);
 	m_RobotHand.Thumb2_Rotate(angle1);
 	m_RobotHand.Thumb3_Rotate(angle1 + angle2);
@@ -1045,9 +1259,27 @@ void CMy3DSLoaderView::OnFist() {
 	m_RobotHand.Thumb2_Rotate_r(angle1);
 	m_RobotHand.Thumb3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Thumb4_Rotate_r(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[0] = angle0;
+		angleLeft[1] = angle1;
+		angleLeft[2] = angle2;
+		angleLeft[3] = angle3;
+		//为angle矩阵赋值
+		angleRight[0] = angle0;
+		angleRight[1] = angle1;
+		angleRight[2] = angle2;
+		angleRight[3] = angle3;
+	}
 
 	m_RobotHand.Thumb_Rotate_b(30);
 	m_RobotHand.Thumb_Rotate_br(30);
+	{
+		//为angle矩阵赋值
+		angleLeft[20] = 30;
+		angleRight[20] = 30;
+	}
+
 	m_RobotHand.drawGL();
 	RenderScene();
 	ofile.close();
@@ -1058,50 +1290,87 @@ void CMy3DSLoaderView::OnPull() {
 	//食指
 	m_RobotHand.Index3_Rotate(60);
 	m_RobotHand.Index4_Rotate(90);
-
 	m_RobotHand.Index3_Rotate_r(60);
 	m_RobotHand.Index4_Rotate_r(90);
+	//为angle矩阵赋值
+	angleLeft[6] = 60;
+	angleLeft[7] = 30;
+	//为angle矩阵赋值
+	angleRight[6] = 60;
+	angleRight[7] = 30;
 
 	//中指
 	m_RobotHand.Middle3_Rotate(60);
 	m_RobotHand.Middle4_Rotate(90);
 	m_RobotHand.Middle3_Rotate_r(60);
 	m_RobotHand.Middle4_Rotate_r(90);
+	//为angle矩阵赋值
+	angleLeft[10] = 60;
+	angleLeft[11] = 30;
+	//为angle矩阵赋值
+	angleRight[10] = 60;
+	angleRight[11] = 30;
 
 	//无名指
 	m_RobotHand.Ring3_Rotate(60);
 	m_RobotHand.Ring4_Rotate(90);
 	m_RobotHand.Ring3_Rotate_r(60);
 	m_RobotHand.Ring4_Rotate_r(90);
+	//为angle矩阵赋值
+	angleLeft[14] = 60;
+	angleLeft[15] = 30;
+	//为angle矩阵赋值
+	angleRight[14] = 60;
+	angleRight[15] = 30;
 
 	//小指
 	m_RobotHand.Little3_Rotate(60);
 	m_RobotHand.Little4_Rotate(90);
 	m_RobotHand.Little3_Rotate_r(60);
 	m_RobotHand.Little4_Rotate_r(90);
+	//为angle矩阵赋值
+	angleLeft[18] = 60;
+	angleLeft[19] = 30;
+	//为angle矩阵赋值
+	angleRight[18] = 60;
+	angleRight[19] = 30;
 
 	//大拇指正向控制
 	m_RobotHand.Thumb3_Rotate(20);
 	m_RobotHand.Thumb4_Rotate(25);
 	m_RobotHand.Thumb3_Rotate_r(20);
 	m_RobotHand.Thumb4_Rotate_r(25);
+	//为angle矩阵赋值
+	angleLeft[2] = 20;
+	angleLeft[3] = 5;
+	//为angle矩阵赋值
+	angleRight[2] = 20;
+	angleRight[3] = 5;
 
 	m_RobotHand.Thumb_Rotate_b(70);
 	m_RobotHand.Thumb_Rotate_br(70);
+	//为angle矩阵赋值
+	angleLeft[20] = 70;
+	angleRight[20] = 70;
+
 	m_RobotHand.drawGL();
 	RenderScene();
 }
 /*插*/
 void CMy3DSLoaderView::OnInsert() {
 	reset();
-	ofile.open("./angle.txt", ios::out | ios::app);     //作为输出文件打开
-	ofile << "插" << endl;
 	/*大拇指运动*/
 	m_RobotHand.Thumb1_Rotate(5);
 	m_RobotHand.Thumb3_Rotate(50);
 	m_RobotHand.Thumb4_Rotate(50);
 	m_RobotHand.Thumb_Rotate_b(60);
-	ofile << "左手大拇指:" << 5 << " " << 0 << " " << 50 << " " << 0 << endl;
+	//为angle矩阵赋值
+	angleLeft[0] = 5;
+	angleLeft[2] = 50;
+	angleLeft[3] = 0;
+	
+	angleLeft[20] = 60;
+
 	/*左手抓取*/
 	//中指
 	int choice[5] = { 0,0,1,0,0 };
@@ -1111,11 +1380,18 @@ void CMy3DSLoaderView::OnInsert() {
 	float angle1 = -*(res + 1);
 	float angle2 = *(res + 2);
 	float angle3 = *(res + 3);
-	ofile << "左手中指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
+
 	m_RobotHand.Middle1_Rotate(angle0);
 	m_RobotHand.Middle2_Rotate(angle1);
 	m_RobotHand.Middle3_Rotate(angle1 + angle2);
 	m_RobotHand.Middle4_Rotate(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[8] = angle0;
+		angleLeft[9] = angle1;
+		angleLeft[10] = angle2;
+		angleLeft[11] = angle3;
+	}
 
 	//无名指
 	choice[3] = 1; choice[2] = 0;
@@ -1124,11 +1400,17 @@ void CMy3DSLoaderView::OnInsert() {
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	ofile << "左手无名指:" << angle0 << " " << angle1 << " " << angle2 << " " <<  angle3 << endl;
 	m_RobotHand.Ring1_Rotate(angle0);
 	m_RobotHand.Ring2_Rotate(angle1);
 	m_RobotHand.Ring3_Rotate(angle1 + angle2);
 	m_RobotHand.Ring4_Rotate(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[12] = angle0;
+		angleLeft[13] = angle1;
+		angleLeft[14] = angle2;
+		angleLeft[15] = angle3;
+	}
 
 	//食指
 	choice[1] = 1; choice[3] = 0;
@@ -1137,11 +1419,17 @@ void CMy3DSLoaderView::OnInsert() {
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	ofile << "左手食指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 	m_RobotHand.Index1_Rotate(angle0);
 	m_RobotHand.Index2_Rotate(angle1);
 	m_RobotHand.Index3_Rotate(angle1 + angle2);
 	m_RobotHand.Index4_Rotate(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[4] = angle0;
+		angleLeft[5] = angle1;
+		angleLeft[6] = angle2;
+		angleLeft[7] = angle3;
+	}
 
 	//小指
 	choice[4] = 1; choice[1] = 0;
@@ -1150,41 +1438,67 @@ void CMy3DSLoaderView::OnInsert() {
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	ofile << "左手小指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 	m_RobotHand.Little1_Rotate(angle0);
 	m_RobotHand.Little2_Rotate(angle1);
 	m_RobotHand.Little3_Rotate(angle1 + angle2);
 	m_RobotHand.Little4_Rotate(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[16] = angle0;
+		angleLeft[17] = angle1;
+		angleLeft[18] = angle2;
+		angleLeft[19] = angle3;
+	}
 
 	//大拇指正向控制
 	m_RobotHand.Thumb2_Rotate_r(60);
 	m_RobotHand.Thumb3_Rotate_r(120);
 	m_RobotHand.Thumb4_Rotate_r(130);
-	ofile << "右手大拇指:" << 0 << " " << 60 << " " << 60 << " " << 10 << endl;
 	m_RobotHand.Thumb_Rotate_br(50);
+	//为angle矩阵赋值
+	angleRight[1] = 60;
+	angleRight[2] = 60;
+	angleRight[3] = 10;
+	angleLeft[20] = 50;
+
 	//食指
 	m_RobotHand.Index2_Rotate_r(60);
 	m_RobotHand.Index3_Rotate_r(120);
 	m_RobotHand.Index4_Rotate_r(160);
-	ofile << "右手食指:" << 0 << " " << 60 << " " << 60 << " " << 40 << endl;
+	//为angle矩阵赋值
+	angleRight[5] = 60;
+	angleRight[6] = 60;
+	angleRight[7] = 10;
+
 	//中指
 	m_RobotHand.Middle2_Rotate_r(60);
 	m_RobotHand.Middle3_Rotate_r(120);
 	m_RobotHand.Middle4_Rotate_r(160);
-	ofile << "右手中指:" << 0 << " " << 60 << " " << 60 << " " << 40 << endl;
+	//为angle矩阵赋值
+	angleRight[9] = 60;
+	angleRight[10] = 60;
+	angleRight[11] = 10;
+
 	//无名指
 	m_RobotHand.Ring2_Rotate_r(60);
 	m_RobotHand.Ring3_Rotate_r(120);
 	m_RobotHand.Ring4_Rotate_r(160);
-	ofile << "右手无名指:" << 0 << " " << 60 << " " << 60 << " " << 40 << endl;
+	//为angle矩阵赋值
+	angleRight[13] = 60;
+	angleRight[14] = 60;
+	angleRight[15] = 10;
+
 	//小指
 	m_RobotHand.Little2_Rotate_r(60);
 	m_RobotHand.Little3_Rotate_r(120);
 	m_RobotHand.Little4_Rotate_r(160);
-	ofile << "右手小指:" << 0 << " " << 60 << " " << 60 << " " << 40 << endl;
+	//为angle矩阵赋值
+	angleRight[17] = 60;
+	angleRight[18] = 60;
+	angleRight[19] = 10;
+
 	m_RobotHand.drawGL();
 	RenderScene();
-	ofile.close();
 }
 /*托*/
 void CMy3DSLoaderView::OnSupport() {
@@ -1195,24 +1509,48 @@ void CMy3DSLoaderView::OnSupport() {
 
 	m_RobotHand.Index3_Rotate_r(30);
 	m_RobotHand.Index4_Rotate_r(60);
-
+	//为angle矩阵赋值
+	angleLeft[6] = 30;
+	angleLeft[7] = 30;
+	//为angle矩阵赋值
+	angleRight[6] = 30;
+	angleRight[7] = 30;
+	
 	//中指
 	m_RobotHand.Middle3_Rotate(30);
 	m_RobotHand.Middle4_Rotate(60);
 	m_RobotHand.Middle3_Rotate_r(30);
 	m_RobotHand.Middle4_Rotate_r(60);
+	//为angle矩阵赋值
+	angleLeft[10] = 30;
+	angleLeft[11] = 30;
+	//为angle矩阵赋值
+	angleRight[10] = 30;
+	angleRight[11] = 30;
 
 	//无名指
 	m_RobotHand.Ring3_Rotate(30);
 	m_RobotHand.Ring4_Rotate(60);
 	m_RobotHand.Ring3_Rotate_r(30);
 	m_RobotHand.Ring4_Rotate_r(60);
+	//为angle矩阵赋值
+	angleLeft[14] = 30;
+	angleLeft[15] = 30;
+	//为angle矩阵赋值
+	angleRight[14] = 30;
+	angleRight[15] = 30;
 
 	//小指
 	m_RobotHand.Little3_Rotate(30);
 	m_RobotHand.Little4_Rotate(60);
 	m_RobotHand.Little3_Rotate_r(30);
 	m_RobotHand.Little4_Rotate_r(60);
+	//为angle矩阵赋值
+	angleLeft[18] = 30;
+	angleLeft[19] = 30;
+	//为angle矩阵赋值
+	angleRight[18] = 30;
+	angleRight[19] = 30;
 
 	//大拇指正向控制
 	m_RobotHand.Thumb1_Rotate(30);
@@ -1221,9 +1559,21 @@ void CMy3DSLoaderView::OnSupport() {
 	m_RobotHand.Thumb1_Rotate_r(30);
 	m_RobotHand.Thumb3_Rotate_r(30);
 	m_RobotHand.Thumb4_Rotate_r(30);
+	//为angle矩阵赋值
+	angleLeft[0] = 30;
+	angleLeft[2] = 30;
+	angleLeft[3] = 0;
+	//为angle矩阵赋值
+	angleRight[0] = 30;
+	angleRight[2] = 30;
+	angleRight[3] = 0;
 
 	m_RobotHand.Thumb_Rotate_b(30);
 	m_RobotHand.Thumb_Rotate_br(30);
+	//为angle矩阵赋值
+	angleLeft[20] = 30;
+	angleRight[20] = 30;
+
 	m_RobotHand.drawGL();
 	RenderScene();
 }
@@ -1235,58 +1585,114 @@ void CMy3DSLoaderView::OnSqueeze() {
 	m_RobotHand.Thumb2_Rotate(30);
 	m_RobotHand.Thumb3_Rotate(60);
 	m_RobotHand.Thumb4_Rotate(130);
+	//为angle矩阵赋值
+	angleLeft[0] = -10;
+	angleLeft[1] = 30;
+	angleLeft[2] = 30;
+	angleLeft[3] = 70;
 
 	m_RobotHand.Thumb_Rotate_b(30);
+	//为angle矩阵赋值
+	angleLeft[20] = 30;
+
 	//食指
 	m_RobotHand.Index1_Rotate(-10);
 	m_RobotHand.Index2_Rotate(60);
 	m_RobotHand.Index3_Rotate(120);
 	m_RobotHand.Index4_Rotate(200);
+	//为angle矩阵赋值
+	angleLeft[4] = -10;
+	angleLeft[5] = 60;
+	angleLeft[6] = 60;
+	angleLeft[7] = 80;
+
 	//中指
 	m_RobotHand.Middle2_Rotate(60);
 	m_RobotHand.Middle3_Rotate(120);
 	m_RobotHand.Middle4_Rotate(200);
+	//为angle矩阵赋值
+	angleLeft[9] = 60;
+	angleLeft[10] = 60;
+	angleLeft[11] = 80;
 
 	//无名指
 	m_RobotHand.Ring1_Rotate(10);
 	m_RobotHand.Ring2_Rotate(60);
 	m_RobotHand.Ring3_Rotate(120);
 	m_RobotHand.Ring4_Rotate(200);
+	//为angle矩阵赋值
+	angleLeft[12] = 10;
+	angleLeft[13] = 60;
+	angleLeft[14] = 60;
+	angleLeft[15] = 80;
 
 	//小指
 	m_RobotHand.Little1_Rotate(10);
 	m_RobotHand.Little2_Rotate(60);
 	m_RobotHand.Little3_Rotate(120);
 	m_RobotHand.Little4_Rotate(200);
+	//为angle矩阵赋值
+	angleLeft[16] = 10;
+	angleLeft[17] = 60;
+	angleLeft[18] = 60;
+	angleLeft[19] = 80;
 
 	//右手大拇指正向控制
 	m_RobotHand.Thumb1_Rotate_r(-10);
 	m_RobotHand.Thumb2_Rotate_r(30);
 	m_RobotHand.Thumb3_Rotate_r(60);
 	m_RobotHand.Thumb4_Rotate_r(130);
+	//为angle矩阵赋值
+	angleRight[0] = -10;
+	angleRight[1] = 30;
+	angleRight[2] = 30;
+	angleRight[3] = 70;
 
 	m_RobotHand.Thumb_Rotate_br(30);
+	//为angle矩阵赋值
+	angleRight[20] = 30;
+
 	//食指
 	m_RobotHand.Index1_Rotate_r(-10);
 	m_RobotHand.Index2_Rotate_r(60);
 	m_RobotHand.Index3_Rotate_r(120);
 	m_RobotHand.Index4_Rotate_r(200);
+	//为angle矩阵赋值
+	angleRight[4] = -10;
+	angleRight[5] = 60;
+	angleRight[6] = 60;
+	angleRight[7] = 80;
 	//中指
 	m_RobotHand.Middle2_Rotate_r(60);
 	m_RobotHand.Middle3_Rotate_r(120);
 	m_RobotHand.Middle4_Rotate_r(200);
+	//为angle矩阵赋值
+	angleRight[9] = 60;
+	angleRight[10] = 60;
+	angleRight[11] = 80;
 
 	//无名指
 	m_RobotHand.Ring1_Rotate_r(10);
 	m_RobotHand.Ring2_Rotate_r(60);
 	m_RobotHand.Ring3_Rotate_r(120);
 	m_RobotHand.Ring4_Rotate_r(200);
+	//为angle矩阵赋值
+	angleRight[12] = -10;
+	angleRight[13] = 60;
+	angleRight[14] = 60;
+	angleRight[15] = 80;
 
 	//小指
 	m_RobotHand.Little1_Rotate_r(10);
 	m_RobotHand.Little2_Rotate_r(60);
 	m_RobotHand.Little3_Rotate_r(120);
 	m_RobotHand.Little4_Rotate_r(200);
+	//为angle矩阵赋值
+	angleRight[16] = -10;
+	angleRight[17] = 60;
+	angleRight[18] = 60;
+	angleRight[19] = 80;
+
 	m_RobotHand.drawGL();
 	RenderScene();
 }
@@ -1299,56 +1705,104 @@ void CMy3DSLoaderView::OnCut()
 	m_RobotHand.Thumb2_Rotate(30);
 	m_RobotHand.Thumb3_Rotate(90);
 	m_RobotHand.Thumb4_Rotate(90);
+	//为angle矩阵赋值
+	angleLeft[0] = -10;
+	angleLeft[1] = 30;
+	angleLeft[2] = 60;
+	angleLeft[3] = 0;
 
 	m_RobotHand.Thumb_Rotate_b(100);
-	
+	//为angle矩阵赋值
+	angleLeft[20] = 100;
+
 	//食指
 	m_RobotHand.Index1_Rotate(-2);
 	m_RobotHand.Index2_Rotate(-5);
 	m_RobotHand.Index3_Rotate(10);
 	m_RobotHand.Index4_Rotate(10);
+	//为angle矩阵赋值
+	angleLeft[4] = -2;
+	angleLeft[5] = -5;
+	angleLeft[6] = 15;
+	angleLeft[7] = 0;
+
 	//中指
 	m_RobotHand.Middle2_Rotate(-5);
 	m_RobotHand.Middle3_Rotate(10);
 	m_RobotHand.Middle4_Rotate(10);
+	//为angle矩阵赋值
+	angleLeft[9] = -5;
+	angleLeft[10] = 15;
+	angleLeft[11] = 0;
 
 	//无名指
 	m_RobotHand.Ring1_Rotate(2);
 	m_RobotHand.Ring2_Rotate(-5);
 	m_RobotHand.Ring3_Rotate(10);
 	m_RobotHand.Ring4_Rotate(10);
+	//为angle矩阵赋值
+	angleLeft[12] = 2;
+	angleLeft[13] = -5;
+	angleLeft[14] = 15;
+	angleLeft[15] = 0;
 
 	//小指
 	m_RobotHand.Little1_Rotate(4);
 	m_RobotHand.Little2_Rotate(-5);
 	m_RobotHand.Little3_Rotate(10);
 	m_RobotHand.Little4_Rotate(10);
+	//为angle矩阵赋值
+	angleLeft[16] = 4;
+	angleLeft[17] = -5;
+	angleLeft[18] = 15;
+	angleLeft[19] = 0;
 
 	/*右手拿剪刀*/
 	//中指
 	m_RobotHand.Middle2_Rotate_r(10);
 	m_RobotHand.Middle3_Rotate_r(80);
 	m_RobotHand.Middle4_Rotate_r(160);
-
+	//为angle矩阵赋值
+	angleRight[9] = 10;
+	angleRight[10] = 70;
+	angleRight[11] = 80;
+	
 	//无名指
 	m_RobotHand.Ring2_Rotate_r(10);
 	m_RobotHand.Ring3_Rotate_r(80);
 	m_RobotHand.Ring4_Rotate_r(160);
+	//为angle矩阵赋值
+	angleRight[13] = 10;
+	angleRight[14] = 70;
+	angleRight[15] = 80;
 
 	//小指
 	m_RobotHand.Little2_Rotate_r(10);
 	m_RobotHand.Little3_Rotate_r(80);
 	m_RobotHand.Little4_Rotate_r(160);
+	//为angle矩阵赋值
+	angleRight[17] = 10;
+	angleRight[18] = 70;
+	angleRight[19] = 80;
 
 	//大拇指正向控制
 	m_RobotHand.Thumb1_Rotate_r(-10);
 	m_RobotHand.Thumb3_Rotate_r(60);
 	m_RobotHand.Thumb4_Rotate_r(80);
+	//为angle矩阵赋值
+	angleRight[0] = -10;
+	angleRight[2] = 60;
+	angleRight[3] = 20;
 
 	m_RobotHand.Thumb_Rotate_br(60);
+	//为angle矩阵赋值
+	angleRight[20] = 60;
 	// 食指
 	m_RobotHand.Index3_Rotate_r(20);
 	m_RobotHand.Index4_Rotate_r(30);
+	//为angle矩阵赋值
+	angleRight[6] = 20;
+	angleRight[7] = 10;
 
 	m_RobotHand.drawGL();
 	RenderScene();
@@ -1357,8 +1811,6 @@ void CMy3DSLoaderView::OnCut()
 void CMy3DSLoaderView::OnRip()
 {
 	reset();
-	ofile.open("./angle.txt", ios::out | ios::app);     //作为输出文件打开
-	ofile << "撕" << endl;
 	//中指
 	int choice[5] = { 0,0,1,0,0 };
 	float* res = m_RobotHand.CalculateThetaByCoordinate(tVector(0.669, 30, -40.0), choice);
@@ -1367,7 +1819,7 @@ void CMy3DSLoaderView::OnRip()
 	float angle1 = -*(res + 1);
 	float angle2 = *(res + 2);
 	float angle3 = *(res + 3);
-	ofile << "中指:" << angle0 << " " << angle1 << " " << angle2 << " " <<  angle3 << endl;
+
 	m_RobotHand.Middle1_Rotate(angle0);
 	m_RobotHand.Middle2_Rotate(angle1);
 	m_RobotHand.Middle3_Rotate(angle1 + angle2);
@@ -1377,6 +1829,18 @@ void CMy3DSLoaderView::OnRip()
 	m_RobotHand.Middle2_Rotate_r(angle1);
 	m_RobotHand.Middle3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Middle4_Rotate_r(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[8] = angle0;
+		angleLeft[9] = angle1;
+		angleLeft[10] =angle2;
+		angleLeft[11] =angle3;
+		//为angle矩阵赋值
+		angleRight[8] = angle0;
+		angleRight[9] = angle1;
+		angleRight[10] = angle2;
+		angleRight[11] = angle3;
+	}
 
 	//无名指
 	choice[3] = 1; choice[2] = 0;
@@ -1385,7 +1849,6 @@ void CMy3DSLoaderView::OnRip()
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	ofile << "无名指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 	m_RobotHand.Ring1_Rotate(angle0); //右手部分
 	m_RobotHand.Ring2_Rotate(angle1);
 	m_RobotHand.Ring3_Rotate(angle1 + angle2);
@@ -1395,6 +1858,18 @@ void CMy3DSLoaderView::OnRip()
 	m_RobotHand.Ring2_Rotate_r(angle1);
 	m_RobotHand.Ring3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Ring4_Rotate_r(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[12] = angle0;
+		angleLeft[13] = angle1;
+		angleLeft[14] = angle2;
+		angleLeft[15] = angle3;
+		//为angle矩阵赋值
+		angleRight[12] = angle0;
+		angleRight[13] = angle1;
+		angleRight[14] = angle2;
+		angleRight[15] = angle3;
+	}
 
 	//小指
 	choice[4] = 1; choice[3] = 0;
@@ -1404,7 +1879,6 @@ void CMy3DSLoaderView::OnRip()
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	ofile << "小指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 	m_RobotHand.Little1_Rotate(angle0);
 	m_RobotHand.Little2_Rotate(angle1);
 	m_RobotHand.Little3_Rotate(angle1 + angle2);
@@ -1414,41 +1888,69 @@ void CMy3DSLoaderView::OnRip()
 	m_RobotHand.Little2_Rotate_r(angle1);
 	m_RobotHand.Little3_Rotate_r(angle1 + angle2);
 	m_RobotHand.Little4_Rotate_r(angle1 + angle2 + angle3);
-
+	{
+		//为angle矩阵赋值
+		angleLeft[16] = angle0;
+		angleLeft[17] = angle1;
+		angleLeft[18] = angle2;
+		angleLeft[19] = angle3;
+		//为angle矩阵赋值
+		angleRight[16] = angle0;
+		angleRight[17] = angle1;
+		angleRight[18] = angle2;
+		angleRight[19] = angle3;
+	}
 
 	//大拇指
 	m_RobotHand.Thumb1_Rotate(-10);
 	m_RobotHand.Thumb3_Rotate(30);
 	m_RobotHand.Thumb4_Rotate(40);
-	ofile << "大拇指:" << -10 << " " << 0 << " " << 30 << " " << 10<<endl;
 	m_RobotHand.Thumb1_Rotate_r(-10);
 	m_RobotHand.Thumb3_Rotate_r(30);
 	m_RobotHand.Thumb4_Rotate_r(40);
+	//为angle矩阵赋值
+	angleLeft[0] = -10;
+	angleLeft[2] = 30;
+	angleLeft[3] = 10;
+	//为angle矩阵赋值
+	angleRight[0] = -10;
+	angleRight[2] = 30;
+	angleRight[3] = 10;
 
 	m_RobotHand.Thumb_Rotate_b(60);
 	m_RobotHand.Thumb_Rotate_br(60);
-	
+	//为angle矩阵赋值
+	angleLeft[20] = 60;
+	angleRight[20] = 60;
+
 	//食指
 	m_RobotHand.Index1_Rotate(-12);
 	m_RobotHand.Index2_Rotate(-10);
 	m_RobotHand.Index3_Rotate(80);
 	m_RobotHand.Index4_Rotate(100);
-	ofile << "食指:" << -12 << " " << -10 << " " << 90 << " " << 10<<endl;
+	
 	m_RobotHand.Index1_Rotate_r(-12);
 	m_RobotHand.Index2_Rotate_r(-10);
 	m_RobotHand.Index3_Rotate_r(80);
 	m_RobotHand.Index4_Rotate_r(100);
+	//为angle矩阵赋值
+	angleLeft[4] = -12;
+	angleLeft[5] = -10;
+	angleLeft[6] = 90;
+	angleLeft[7] = 10;
+	//为angle矩阵赋值
+	angleRight[4] = -12;
+	angleRight[5] = -10;
+	angleRight[6] = 90;
+	angleRight[7] = 10;
 
 	m_RobotHand.drawGL();
 	RenderScene();
-	ofile.close();
 }
 /*钳*/
 void CMy3DSLoaderView::OnTongs() 
 {
 	reset();
-	ofile.open("./angle.txt", ios::out | ios::app);     //作为输出文件打开
-	ofile << "钳" << endl;
 	//中指
 	int choice[5] = { 0,0,1,0,0 };
 	float* res = m_RobotHand.CalculateThetaByCoordinate(tVector(0.669, 30, -40.0), choice);
@@ -1457,11 +1959,17 @@ void CMy3DSLoaderView::OnTongs()
 	float angle1 = -*(res + 1);
 	float angle2 = *(res + 2);
 	float angle3 = *(res + 3);
-	ofile << "左手中指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 	m_RobotHand.Middle1_Rotate(angle0);
 	m_RobotHand.Middle2_Rotate(angle1);
 	m_RobotHand.Middle3_Rotate(angle1 + angle2);
 	m_RobotHand.Middle4_Rotate(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[8] = angle0;
+		angleLeft[9] = angle1;
+		angleLeft[10] = angle2;
+		angleLeft[11] = angle3;
+	}
 
 	//无名指
 	choice[3] = 1; choice[2] = 0;
@@ -1470,65 +1978,106 @@ void CMy3DSLoaderView::OnTongs()
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	ofile << "左手无名指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 	m_RobotHand.Ring1_Rotate(angle0); 
 	m_RobotHand.Ring2_Rotate(angle1);
 	m_RobotHand.Ring3_Rotate(angle1 + angle2);
 	m_RobotHand.Ring4_Rotate(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[12] = angle0;
+		angleLeft[13] = angle1;
+		angleLeft[14] = angle2;
+		angleLeft[15] = angle3;
+	}
 
 	//小指
 	choice[4] = 1; choice[3] = 0;
 	res = m_RobotHand.CalculateThetaByCoordinate(tVector(-43.541, 30, -20.0), choice);
-
 	angle0 = -(*res);
 	angle1 = -*(res + 1);
 	angle2 = *(res + 2);
 	angle3 = *(res + 3);
-	ofile << "左手小指:" << angle0 << " " << angle1 << " " <<  angle2 << " " <<  angle3 << endl;
 	m_RobotHand.Little1_Rotate(angle0);
 	m_RobotHand.Little2_Rotate(angle1);
 	m_RobotHand.Little3_Rotate(angle1 + angle2);
 	m_RobotHand.Little4_Rotate(angle1 + angle2 + angle3);
+	{
+		//为angle矩阵赋值
+		angleLeft[16] = angle0;
+		angleLeft[17] = angle1;
+		angleLeft[18] = angle2;
+		angleLeft[19] = angle3;
+	}
 
 	//大拇指
 	m_RobotHand.Thumb1_Rotate(-10);
 	m_RobotHand.Thumb3_Rotate(30);
 	m_RobotHand.Thumb4_Rotate(40);
 	m_RobotHand.Thumb_Rotate_b(60);
-	ofile << "左手大拇指:" << -10 << " " << 0 << " " << 30 << " " << 10 << endl;
+	//为angle矩阵赋值
+	angleLeft[0] = -10;
+	angleLeft[2] = 30;
+	angleLeft[3] = 10;
+	angleLeft[20] = 20;
 
 	//食指
 	m_RobotHand.Index1_Rotate(-12);
 	m_RobotHand.Index2_Rotate(-10);
 	m_RobotHand.Index3_Rotate(80);
 	m_RobotHand.Index4_Rotate(100);
-	ofile << "左手食指:" << -12 << " " << -10 << " " << 90 << " " << 10 << endl;
+	//为angle矩阵赋值
+	angleLeft[4] = -12;
+	angleLeft[5] = -10;
+	angleLeft[6] = 90;
+	angleLeft[7] = 10;
+
 	/*右手拿钳*/
 	//中指
 	m_RobotHand.Middle2_Rotate_r(10);
 	m_RobotHand.Middle3_Rotate_r(80);
 	m_RobotHand.Middle4_Rotate_r(160);
-	ofile << "右手中指:" << 0 << " " << 10 << " " << 70 << " " << 90 << endl;
+	//为angle矩阵赋值
+	angleRight[9] = 10;
+	angleRight[10] = 70;
+	angleRight[11] = 80;
+
 	//无名指
 	m_RobotHand.Ring2_Rotate_r(10);
 	m_RobotHand.Ring3_Rotate_r(80);
 	m_RobotHand.Ring4_Rotate_r(160);
-	ofile << "右手无名指:" << 0 << " " << 10 << " " << 70 << " " << 90 << endl;
+	//为angle矩阵赋值
+	angleRight[13] = 10;
+	angleRight[14] = 70;
+	angleRight[15] = 80;
+
 	//小指
 	m_RobotHand.Little2_Rotate_r(10);
 	m_RobotHand.Little3_Rotate_r(80);
 	m_RobotHand.Little4_Rotate_r(160);
-	ofile << "右手小指:" << 0 << " " << 10 << " " << 70 << " " << 90 << endl;
+	//为angle矩阵赋值
+	angleRight[17] = 10;
+	angleRight[18] = 70;
+	angleRight[19] = 80;
+
 	//大拇指正向控制
 	m_RobotHand.Thumb1_Rotate_r(-10);
 	m_RobotHand.Thumb3_Rotate_r(60);
 	m_RobotHand.Thumb4_Rotate_r(80);
-	ofile << "右手大拇指:" << 0 << " " << 10 << " " << 70 << " " << 90 << endl;
+	//为angle矩阵赋值
+	angleRight[0] = -10;
+	angleRight[2] = 60;
+	angleRight[3] = 20;
+
 	m_RobotHand.Thumb_Rotate_br(60);
+	//为angle矩阵赋值
+	angleRight[20] = 60;
 	// 食指
 	m_RobotHand.Index3_Rotate_r(20);
 	m_RobotHand.Index4_Rotate_r(30);
-	ofile << "右手食指:" << 0 << " " << 0 << " " << 20 << " " << 10 << endl;
+	//为angle矩阵赋值
+	angleRight[6] = 20;
+	angleRight[7] = 30;
+
 	m_RobotHand.drawGL();
 	RenderScene();
 }
@@ -1542,25 +2091,65 @@ void CMy3DSLoaderView::OnSetAngle(float *angle)
 	m_RobotHand.Thumb4_Rotate((angle[0] + angle[1]));
 	//m_RobotHand.Thumb_Rotate_b(angle[2] + 15);
 	m_RobotHand.Thumb_Rotate_b(angle[14]);
+	{
+		//为angle矩阵赋值
+		angleLeft[0] = angle[2] - 20;
+		angleLeft[1] = angle[0];
+		angleLeft[2] = angle[1];
+		angleLeft[3] = angle[1];
+		
+		angleLeft[20] = angle[14];
+	}
 
 	m_RobotHand.Index1_Rotate(angle[5]);
 	m_RobotHand.Index2_Rotate(angle[3]);
 	m_RobotHand.Index3_Rotate(angle[3]+angle[4]);
 	m_RobotHand.Index4_Rotate((angle[3] + angle[4])*1.67);
+	{
+		//为angle矩阵赋值
+		angleLeft[4] = angle[5];
+		angleLeft[5] = angle[3];
+		angleLeft[6] = angle[4];
+		angleLeft[7] = angle[4]*0.67;
+
+	}
 
 	m_RobotHand.Middle2_Rotate(angle[6]);
 	m_RobotHand.Middle3_Rotate(angle[6]+angle[7]);
 	m_RobotHand.Middle4_Rotate((angle[6] + angle[7])*1.67);
+	{
+		//为angle矩阵赋值
+		angleLeft[13] = angle[6];
+		angleLeft[14] = angle[7];
+		angleLeft[15] = angle[7]*0.67;
+
+	}
 
 	m_RobotHand.Ring1_Rotate(-angle[8]);
 	m_RobotHand.Ring2_Rotate(angle[9]);
 	m_RobotHand.Ring3_Rotate(angle[9] + angle[10]);
 	m_RobotHand.Ring4_Rotate((angle[9] + angle[10])*1.67);
+	{
+		//为angle矩阵赋值
+		angleLeft[12] = -angle[8];
+		angleLeft[13] = angle[9];
+		angleLeft[14] = angle[10];
+		angleLeft[15] = angle[10]*0.67;
+
+	}
 
 	m_RobotHand.Little1_Rotate(-(angle[11]+angle[8]));
 	m_RobotHand.Little2_Rotate(angle[12]);
 	m_RobotHand.Little3_Rotate(angle[12] + angle[13]);
 	m_RobotHand.Little4_Rotate((angle[12] + angle[13])*1.67);
+	{
+		//为angle矩阵赋值
+		angleLeft[16] = -(angle[11] + angle[8]);
+		angleLeft[17] = angle[12];
+		angleLeft[18] = angle[13];
+		angleLeft[19] = angle[13]*0.67;
+
+	}
 
 	m_RobotHand.Thumb1_Rotate_r(angle[2] - 20);
 	m_RobotHand.Thumb2_Rotate_r(angle[0]);
@@ -1568,25 +2157,65 @@ void CMy3DSLoaderView::OnSetAngle(float *angle)
 	m_RobotHand.Thumb4_Rotate_r((angle[0] + angle[1])*1.67);
 	//m_RobotHand.Thumb_Rotate_br(angle[2] + 15);
 	m_RobotHand.Thumb_Rotate_br(angle[14]);
+	{
+		//为angle矩阵赋值
+		angleRight[0] = angle[2] - 20;
+		angleRight[1] = angle[0];
+		angleRight[2] = angle[1];
+		angleRight[3] = angle[1];
+
+		angleRight[20] = angle[14];
+	}
 
 	m_RobotHand.Index1_Rotate_r(angle[5]);
 	m_RobotHand.Index2_Rotate_r(angle[3]);
 	m_RobotHand.Index3_Rotate_r(angle[3] + angle[4]);
 	m_RobotHand.Index4_Rotate_r((angle[3] + angle[4])*1.67);
+	{
+		//为angle矩阵赋值
+		angleRight[4] = angle[5];
+		angleRight[5] = angle[3];
+		angleRight[6] = angle[4];
+		angleRight[7] = angle[4] * 0.67;
+
+	}
 
 	m_RobotHand.Middle2_Rotate_r(angle[6]);
 	m_RobotHand.Middle3_Rotate_r(angle[6] + angle[7]);
 	m_RobotHand.Middle4_Rotate_r((angle[6] + angle[7])*1.67);
+	{
+		//为angle矩阵赋值
+		angleRight[13] = angle[6];
+		angleRight[14] = angle[7];
+		angleRight[15] = angle[7] * 0.67;
+
+	}
 
 	m_RobotHand.Ring1_Rotate_r(-angle[8]);
 	m_RobotHand.Ring2_Rotate_r(angle[9]);
 	m_RobotHand.Ring3_Rotate_r(angle[9] + angle[10]);
 	m_RobotHand.Ring4_Rotate_r((angle[9] + angle[10])*1.67);
+	{
+		//为angle矩阵赋值
+		angleRight[12] = -angle[8];
+		angleRight[13] = angle[9];
+		angleRight[14] = angle[10];
+		angleRight[15] = angle[10] * 0.67;
+
+	}
 
 	m_RobotHand.Little1_Rotate_r(-(angle[11] + angle[8]));
 	m_RobotHand.Little2_Rotate_r(angle[12]);
 	m_RobotHand.Little3_Rotate_r(angle[12] + angle[13]);
 	m_RobotHand.Little4_Rotate_r((angle[12] + angle[13])*1.67);
+	{
+		//为angle矩阵赋值
+		angleRight[16] = -(angle[11] + angle[8]);
+		angleRight[17] = angle[12];
+		angleRight[18] = angle[13];
+		angleRight[19] = angle[13] * 0.67;
+
+	}
 
 	m_RobotHand.drawGL();
 	RenderScene();
@@ -1646,6 +2275,11 @@ void CMy3DSLoaderView::OnReset()
 
 		m_RobotHand.objects[i]->sceneRot[0] = 0;
 		m_RobotHand.objects[i]->angle = 0;
+	}
+	//存储角度矩阵置零
+	for (int i = 0; i < 21; i++)
+	{
+		angleLeft[i] =0;
 	}
 
 	m_RobotHand.drawGL();

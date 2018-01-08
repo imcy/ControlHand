@@ -51,6 +51,7 @@
 #define IDC_BUTTON2                     1035
 #define IDC_SELF                        1035
 #define IDC_DRAWLINE                    1035
+#define IDC_SENDFILE                    1035
 #define IDC_LIST1                       1036
 #define IDC_CHECK1                      1037
 #define IDC_CLS                         1038
@@ -71,6 +72,8 @@
 #define IDC_TCHART5                     1046
 #define IDC_EY2                         1047
 #define IDC_TCHART6                     1047
+#define IDC_WRITEANGLE                  1047
+#define IDC_COMBOCLIENT                 1048
 #define ID_Tongs                        32763
 #define ID_Rip                          32764
 #define ID_Cut                          32765
@@ -113,7 +116,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         32798
-#define _APS_NEXT_CONTROL_VALUE         1044
+#define _APS_NEXT_CONTROL_VALUE         1049
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

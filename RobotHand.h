@@ -34,7 +34,6 @@ private:
 
 public:
 	CKnuckle* objects[100];	
-//	CKnuckle* objects_r[100];
 	
 public:
 	void Initial_Length();//初始化各个指节的长度

@@ -10,6 +10,8 @@
 #endif // _MSC_VER > 1000
 #define WM_MYMSG  WM_USER+200
 #define WM_MYMSG2  WM_USER+100
+#define WM_MYMSG3  WM_USER+300
+
 class CMainFrame : public CFrameWnd
 {
 	
@@ -50,6 +52,7 @@ protected:
 	//}}AFX_MSG
 	afx_msg LRESULT MyMsgHandler(WPARAM, LPARAM);
 	afx_msg LRESULT MyMsgHandler2(WPARAM, LPARAM);
+	afx_msg LRESULT MyMsgHandler3(WPARAM, LPARAM);
 	DECLARE_MESSAGE_MAP()
 };
 

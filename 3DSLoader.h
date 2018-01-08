@@ -32,6 +32,7 @@ public:
 	KinectWin *kinwin;
 	void OnTest();
 	void OnAngle(); //角度处理函数
+	void OnGetAngle(); //角度获取函数
 	//}}AFX_VIRTUAL
 
 // Implementation

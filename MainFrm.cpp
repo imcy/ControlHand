@@ -23,6 +23,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
 	ON_MESSAGE(WM_MYMSG, MyMsgHandler)
 	ON_MESSAGE(WM_MYMSG2, MyMsgHandler2)
+	ON_MESSAGE(WM_MYMSG3, MyMsgHandler3)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -90,6 +91,12 @@ LRESULT CMainFrame::MyMsgHandler2(WPARAM, LPARAM)	//消息处理2，同步角度
 	CMainFrame *pMain = (CMainFrame *)AfxGetApp()->m_pMainWnd;
 	((CMy3DSLoaderApp*)AfxGetApp())->OnAngle();
 
+	return 0;
+}
+LRESULT CMainFrame::MyMsgHandler3(WPARAM, LPARAM)	//消息处理2，同步角度
+{
+	CMainFrame *pMain = (CMainFrame *)AfxGetApp()->m_pMainWnd;
+	((CMy3DSLoaderApp*)AfxGetApp())->OnGetAngle();
 	return 0;
 }
 

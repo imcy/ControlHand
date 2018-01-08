@@ -138,7 +138,13 @@ void CMy3DSLoaderApp::OnAngle()
 	CMy3DSLoaderView *pView = (CMy3DSLoaderView *)pMain->GetActiveView();
 	pView->OnSetAngle(dlg->angle);
 }
-
+void CMy3DSLoaderApp::OnGetAngle()
+{
+	//»ñÈ¡½Ç¶È
+	CMainFrame *pMain = (CMainFrame *)AfxGetApp()->m_pMainWnd;
+	CMy3DSLoaderView *pView = (CMy3DSLoaderView *)pMain->GetActiveView();
+	pView->GetAngle();
+}
 /////////////////////////////////////////////////////////////////////////////
 // CAboutDlg dialog used for App About
 

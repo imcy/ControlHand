@@ -205,7 +205,7 @@ void CRobotHand::drawGL()
 		::glTranslatef(objects[i]->currentPos.x, objects[i]->currentPos.y, objects[i]->currentPos.z);
 		::glRotatef(objects[i]->sceneRot[1], 0.0F, 1.0F, 0.0F);
 		::glRotatef(0, 0.0F, 1.0F, 0.0F);
-	//	RotateFunction_b(i,-30);
+
 		::glRotatef(objects[i]->sceneRot[2], 0.0F, 0.0F, 1.0F);
 		::glRotatef(-30, 0.0F, 0.0F, 1.0F);
 		::glRotatef(objects[i]->sceneRot[0], 1.0F, 0.0F, 0.0F);
@@ -213,7 +213,6 @@ void CRobotHand::drawGL()
 		::glTranslatef(-CGloableVariable::defaultPos[i][0], -CGloableVariable::defaultPos[i][1], -CGloableVariable::defaultPos[i][2]);
 		objects[i]->drawGL();
 		::glPopMatrix();
-
 	}
 	//画其余四指
 	for (int i = 5; i <numobjects-22; i++)
@@ -356,75 +355,74 @@ void CRobotHand::RotateFunction(int i , float angle)          //转动函数
 	{
 		if(i==1)
 		{
-	//如果angle大于0，则向左侧摆，否则向右侧摆    -60<angle<30
-	objects[i]->sceneRot[2] += angle;
-	//第一个指节与手掌相连，该指节只能侧向运动，与手掌在同一个平面内
-	float theta = ConvertAngleToRadian(angle);//将角度转化成弧度
-	objects[i]->angle += theta;
-	objects[i]->lastPos = objects[i]->currentPos;//更新上一次坐标位置
+			//如果angle大于0，则向左侧摆，否则向右侧摆    -60<angle<30
+			objects[i]->sceneRot[2] += angle;
+			//第一个指节与手掌相连，该指节只能侧向运动，与手掌在同一个平面内
+			float theta = ConvertAngleToRadian(angle);//将角度转化成弧度
+			objects[i]->angle += theta;
+			objects[i]->lastPos = objects[i]->currentPos;//更新上一次坐标位置
 	
-	objects[i]->currentPos.x = -finger_d [(i-1)/4];
-	objects[i]->currentPos.y = finger_L [(i-1)/4];
-	objects[i]->currentPos.z = objects[0]->currentPos.z;
-
+			objects[i]->currentPos.x = -finger_d [(i-1)/4];
+			objects[i]->currentPos.y = finger_L [(i-1)/4];
+			objects[i]->currentPos.z = objects[0]->currentPos.z;
 		}
 		if(i==2)
 		{
-	//先把此指节倾斜（按第一指节的角度）
-	objects[i]->sceneRot[2] =objects[i-1]->sceneRot[2];
+			//先把此指节倾斜（按第一指节的角度）
+			objects[i]->sceneRot[2] =objects[i-1]->sceneRot[2];
 
-	//如果angle>0向手掌内部弯曲(弯向手掌),否则向手掌外部弯曲
-	objects[i]->sceneRot[0] -= angle;
-	//第二个指节只能进行弯曲(向手掌靠近方向弯曲及相反方向),不能进行侧向运动
-	float theta = ConvertAngleToRadian(angle);//将角度转化成弧度
-	objects[i]->angle += theta;
-	objects[i]->lastPos = objects[i]->currentPos;//更新上一次坐标位置
+			//如果angle>0向手掌内部弯曲(弯向手掌),否则向手掌外部弯曲
+			objects[i]->sceneRot[0] -= angle;
+			//第二个指节只能进行弯曲(向手掌靠近方向弯曲及相反方向),不能进行侧向运动
+			float theta = ConvertAngleToRadian(angle);//将角度转化成弧度
+			objects[i]->angle += theta;
+			objects[i]->lastPos = objects[i]->currentPos;//更新上一次坐标位置
 
-	objects[i]->currentPos.x = -finger_d[(i-1)/4] +
-		(objects[i-1]->length)*cos(objects[i-1]->angle );//x= - di + a1*c(1角+60度)
-	objects[i]->currentPos.y = finger_L[(i-1)/4] +
-		(objects[i-1]->length)*sin(objects[i-1]->angle );//y=li + a1*c(1角+60度)
-	objects[i]->currentPos.z = objects[0]->currentPos.z ;// z= palm.z
+			objects[i]->currentPos.x = -finger_d[(i-1)/4] +
+				(objects[i-1]->length)*cos(objects[i-1]->angle );//x= - di + a1*c(1角+60度)
+			objects[i]->currentPos.y = finger_L[(i-1)/4] +
+				(objects[i-1]->length)*sin(objects[i-1]->angle );//y=li + a1*c(1角+60度)
+			objects[i]->currentPos.z = objects[0]->currentPos.z ;// z= palm.z
 
 		}
 		if(i==3)
 		{
 			objects[i]->sceneRot[2] =objects[i-2]->sceneRot[2];
-	objects[i]->sceneRot[0] -= angle;
-	float theta = ConvertAngleToRadian(angle);//将角度转化成弧度
-	objects[i]->angle += theta;
-	objects[i]->lastPos = objects[i]->currentPos;//更新上一次坐标位置
+			objects[i]->sceneRot[0] -= angle;
+			float theta = ConvertAngleToRadian(angle);//将角度转化成弧度
+			objects[i]->angle += theta;
+			objects[i]->lastPos = objects[i]->currentPos;//更新上一次坐标位置
 
-	objects[i]->currentPos.x = -finger_d[(i-1)/4] +
-		cos(objects[i-2]->angle)*(objects[i-2]->length +
-			((objects[i-1]->length)*cos(objects[i-1]->angle)));//x= - di + c1*(a1 + a2*c2)
-	objects[i]->currentPos.y = finger_L[(i-1)/4] +
-		sin(objects[i-2]->angle)*(objects[i-2]->length +
-			((objects[i-1]->length)*cos(objects[i-1]->angle)));//y=li + s1*(a1 + a2*c2)
-	objects[i]->currentPos.z = objects[0]->currentPos.z -
-		sin(objects[i-1]->angle)*(objects[i-1]->length);// z=0 - s2*a2
+			objects[i]->currentPos.x = -finger_d[(i-1)/4] +
+				cos(objects[i-2]->angle)*(objects[i-2]->length +
+					((objects[i-1]->length)*cos(objects[i-1]->angle)));//x= - di + c1*(a1 + a2*c2)
+			objects[i]->currentPos.y = finger_L[(i-1)/4] +
+				sin(objects[i-2]->angle)*(objects[i-2]->length +
+					((objects[i-1]->length)*cos(objects[i-1]->angle)));//y=li + s1*(a1 + a2*c2)
+			objects[i]->currentPos.z = objects[0]->currentPos.z -
+				sin(objects[i-1]->angle)*(objects[i-1]->length);// z=0 - s2*a2
 		}
 		if(i==4)
 		{
 			objects[i]->sceneRot[2] =objects[i-3]->sceneRot[2];
-	objects[i]->sceneRot[0] -= angle;
-	float theta = ConvertAngleToRadian(angle);//将角度转化成弧度
-	objects[i]->angle += theta;
-	objects[i]->lastPos = objects[i]->currentPos;//更新上一次坐标位置
+			objects[i]->sceneRot[0] -= angle;
+			float theta = ConvertAngleToRadian(angle);//将角度转化成弧度
+			objects[i]->angle += theta;
+			objects[i]->lastPos = objects[i]->currentPos;//更新上一次坐标位置
 
-	objects[i]->currentPos.x = -finger_d[(i-1)/4] +
-		cos(objects[i-3]->angle)* (objects [i-3]->length +
-		cos(objects[i-2]->angle)* objects[i-2]->length +
-		cos(objects[i-1]->angle) * objects[i-1]->length);
-	//x=  -di + c1*(a1 + c2*a2 + c23*a3)
-	objects[i]->currentPos.y = finger_L[(i-1)/4] +
-		sin(objects[i-3]->angle)* (objects [i-3]->length +
-		cos(objects[i-2]->angle)* objects[i-2]->length +
-		cos(objects[i-1]->angle) * objects[i-1]->length);
-	//y=   li + s1*(a1 + c2*a2 + c23*a3)
-	objects[i]->currentPos.z = objects[0]->currentPos.z -
-		sin(objects[i-2]->angle)* objects [i-2]->length -
-		sin(objects[i-1]->angle)* objects[i-1]->length;
+			objects[i]->currentPos.x = -finger_d[(i-1)/4] +
+				cos(objects[i-3]->angle)* (objects [i-3]->length +
+				cos(objects[i-2]->angle)* objects[i-2]->length +
+				cos(objects[i-1]->angle) * objects[i-1]->length);
+			//x=  -di + c1*(a1 + c2*a2 + c23*a3)
+			objects[i]->currentPos.y = finger_L[(i-1)/4] +
+				sin(objects[i-3]->angle)* (objects [i-3]->length +
+				cos(objects[i-2]->angle)* objects[i-2]->length +
+				cos(objects[i-1]->angle) * objects[i-1]->length);
+			//y=   li + s1*(a1 + c2*a2 + c23*a3)
+			objects[i]->currentPos.z = objects[0]->currentPos.z -
+				sin(objects[i-2]->angle)* objects [i-2]->length -
+				sin(objects[i-1]->angle)* objects[i-1]->length;
 
 		}
 		objects[i]->currentPos.x = objects[i]->currentPos.x - 150;

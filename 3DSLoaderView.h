@@ -63,6 +63,8 @@ private:
 	BOOL OpenFile(CRobotHand& ctl, LPCTSTR lpszPathName);
 	void reset();
 	
+	
+	
 	CRobotHand	m_RobotHand;		
 	BOOL		m_3dsLoaded;	
 	ofstream ofile;               //定义输出文件
@@ -121,6 +123,10 @@ public:
 	afx_msg void OnTongs();
 	afx_msg void OnSetAngle(float *angle);
 	afx_msg void OnTest();
+
+	void GetAngle();
+	float angleLeft[21];	//左手角度
+	float angleRight[21];	//右手角度
 };
 
 #ifndef _DEBUG  // debug version in 3DSLoaderView.cpp
